@@ -20,6 +20,7 @@ src/
 │   │   ├── hooks/       # React hooks for feature logic
 │   │   ├── services/    # Pure functions, API calls
 │   │   └── types/       # TypeScript types for feature
+│   ├── breathwork/      # Breathing session engine, timer hook and components (/breathe)
 │   ├── harness-overview/ # /harness overview route + home-page welcome card (deletable)
 │   └── tasks/           # Dev-only task backlog (/tasks)
 ├── layouts/             # App shell: wires features into page chrome
@@ -59,6 +60,7 @@ Pages → Components → Hooks → Services → Shared Services
 ```
 
 **Rules:**
+
 1. **Pages** can import from: Components, Hooks, Layouts, shared context
 2. **Components** can import from: Common components, Hooks (same feature), Types
 3. **Hooks** can import from: Services (same feature), Types
@@ -101,6 +103,7 @@ features/[feature-name]/
 ### Example: Auth Feature
 
 **Types** (`types/auth.types.ts`):
+
 ```typescript
 export interface User {
   id: string;
@@ -109,6 +112,7 @@ export interface User {
 ```
 
 **Service** (`services/authService.ts`):
+
 ```typescript
 // Pure functions, no React hooks
 export const login = async (credentials) => {
@@ -117,6 +121,7 @@ export const login = async (credentials) => {
 ```
 
 **Hook** (`hooks/useAuth.ts`):
+
 ```typescript
 // Uses React hooks, calls services
 export const useAuth = () => {
@@ -126,6 +131,7 @@ export const useAuth = () => {
 ```
 
 **Component** (`components/LoginForm.tsx`):
+
 ```typescript
 // UI only, uses hooks
 export const LoginForm = () => {
@@ -135,6 +141,7 @@ export const LoginForm = () => {
 ```
 
 **Page** (`pages/HomePage.tsx`):
+
 ```typescript
 // Route-level, composes components
 export const HomePage = () => {
@@ -146,20 +153,20 @@ export const HomePage = () => {
 
 ### Where to Put Code
 
-| What | Where |
-|------|-------|
-| Reusable UI component (no logic) | `src/components/common/` |
-| Feature-specific UI component | `src/features/[feature]/components/` |
-| React hook with state | `src/features/[feature]/hooks/` or `src/shared/hooks/` |
-| Pure function, API call | `src/features/[feature]/services/` |
-| TypeScript types | `src/features/[feature]/types/` |
-| Feature-specific utility function | `src/features/[feature]/services/` or `src/shared/utils/` |
-| Feature-local documentation | `src/features/[feature]/README.md` (+ optional `src/features/[feature]/docs/*.md`) |
-| Route-level component | `src/pages/` |
-| Layout wrapper | `src/layouts/` |
-| Global state (Context) | `src/shared/context/` |
-| Shared service (Supabase, data providers) | `src/shared/services/` |
-| Shared utility (cross-feature) | `src/shared/utils/` |
+| What                                      | Where                                                                              |
+| ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| Reusable UI component (no logic)          | `src/components/common/`                                                           |
+| Feature-specific UI component             | `src/features/[feature]/components/`                                               |
+| React hook with state                     | `src/features/[feature]/hooks/` or `src/shared/hooks/`                             |
+| Pure function, API call                   | `src/features/[feature]/services/`                                                 |
+| TypeScript types                          | `src/features/[feature]/types/`                                                    |
+| Feature-specific utility function         | `src/features/[feature]/services/` or `src/shared/utils/`                          |
+| Feature-local documentation               | `src/features/[feature]/README.md` (+ optional `src/features/[feature]/docs/*.md`) |
+| Route-level component                     | `src/pages/`                                                                       |
+| Layout wrapper                            | `src/layouts/`                                                                     |
+| Global state (Context)                    | `src/shared/context/`                                                              |
+| Shared service (Supabase, data providers) | `src/shared/services/`                                                             |
+| Shared utility (cross-feature)            | `src/shared/utils/`                                                                |
 
 ### Examples
 
@@ -203,6 +210,7 @@ The project enforces complexity thresholds to maintain code maintainability:
 Exact thresholds live in `eslint.config.js` and `.claude/rules/code-style.md` if this list drifts.
 
 **Refactoring Patterns Used:**
+
 - **Extract Method/Function**: Break long functions into smaller, focused functions
 - **Extract Component**: Split large React components into smaller sub-components
 - **Extract Hook**: Move complex logic from components into custom hooks
@@ -216,13 +224,15 @@ When complexity violations are detected, refactor using these patterns to improv
 ### The Three Tools
 
 #### 1. **ESLint** (The Engine)
+
 - **Purpose**: Static code analysis tool that identifies bugs, enforces code quality, and catches potential errors
 - **What it checks**: Logic errors, unused variables, type issues, best practices, code smells
 - **Examples**: `no-var` (enforces `let`/`const`), `eqeqeq` (enforces `===`), `no-floating-promises` (catches unhandled promises)
 
 #### 2. **GTS** (Google TypeScript Style - The Configuration)
+
 - **Purpose**: Google's opinionated TypeScript style guide that provides a pre-configured ESLint setup
-- **What it provides**: 
+- **What it provides**:
   - Pre-configured ESLint rules following Google's standards
   - TypeScript-specific linting rules via `typescript-eslint`
   - Integration with Prettier (includes `eslint-config-prettier` and `eslint-plugin-prettier`)
@@ -230,6 +240,7 @@ When complexity violations are detected, refactor using these patterns to improv
 - **Why we use it**: Provides a solid, battle-tested foundation of code quality rules without manual configuration
 
 #### 3. **Prettier** (The Formatter)
+
 - **Purpose**: Opinionated code formatter that automatically formats code for consistency
 - **What it handles**: Indentation, quotes, line breaks, spacing, semicolons, trailing commas
 - **Why we use it**: Eliminates formatting debates and ensures consistent code style across the entire codebase
@@ -243,6 +254,7 @@ Each tool serves a distinct purpose:
 - **Prettier**: Handles all formatting concerns (ensures consistent style)
 
 Together, they provide:
+
 - ✅ **Code Quality**: GTS + ESLint catch bugs and enforce best practices
 - ✅ **Architecture Enforcement**: Custom ESLint rules prevent architectural violations
 - ✅ **Consistent Formatting**: Prettier ensures uniform code style
@@ -262,12 +274,14 @@ GTS (base rules) → Custom ESLint rules → Prettier (formatting)
 ### Configuration Details
 
 **Prettier Configuration** (`.prettierrc.json`):
+
 - Uses **double quotes** (`"singleQuote": false`)
 - 100 character line width
 - 2 space indentation
 - LF line endings (Unix-style)
 
 **ESLint Configuration** (`eslint.config.js`):
+
 - Extends GTS configuration
 - Overrides GTS's quote rule to match Prettier (double quotes)
 - Adds custom architecture enforcement rules
@@ -284,10 +298,10 @@ rules: {
 
 ### Workflow
 
-1. **During Development**: 
+1. **During Development**:
    - Your editor should format on save using Prettier
    - ESLint provides real-time feedback in your IDE
-   - **Editor Setup**: 
+   - **Editor Setup**:
      - **VS Code/Cursor**: Install "Prettier" and "ESLint" extensions, enable "Format on Save"
      - **Other editors**: Configure Prettier and ESLint plugins to run on save
 
@@ -303,14 +317,17 @@ rules: {
 ### Common Issues and Solutions
 
 **Issue**: ESLint complains about quote style
+
 - **Cause**: GTS's quote rule conflicts with Prettier
 - **Solution**: Already handled in `eslint.config.js` - GTS's quote rule is overridden to match Prettier
 
 **Issue**: Formatting conflicts between tools
+
 - **Cause**: ESLint and Prettier both trying to enforce formatting
 - **Solution**: `eslint-config-prettier` (included in GTS) disables conflicting ESLint formatting rules
 
 **Issue**: AI agents generating wrong quotes
+
 - **Cause**: Tools have conflicting quote preferences
 - **Solution**: Configuration ensures Prettier is the single source of truth for formatting
 
@@ -345,7 +362,7 @@ This harness supports connecting to external APIs:
 - **Supabase database**: schema, RLS and the signals tables (error logs, feedback, bugs) live in `supabase/migrations/`; access model in `supabase/README.md`
 - **Error reporting**: `src/features/error-reporting/` sends browser errors to `error_logs` (see its README)
 
-**Researching a new external API before wiring it up?** See `.claude/rules/api-integration.md` (principles) and `.agents/skills/loop-plan/references/research-api.md` (MCP-first, schema→sample procedure) — this bullet describes *what's configured*, not *how to research* a new vendor/API.
+**Researching a new external API before wiring it up?** See `.claude/rules/api-integration.md` (principles) and `.agents/skills/loop-plan/references/research-api.md` (MCP-first, schema→sample procedure) — this bullet describes _what's configured_, not _how to research_ a new vendor/API.
 
 Both services are optional. The services are initialized in `shared/services/` and can be used directly in feature services.
 
@@ -393,10 +410,9 @@ Fresh clones ship onboarding tasks (Supabase, Hosting, App vision, Theme). See `
 ## Questions?
 
 If you're unsure where to put code:
+
 1. Is it reusable UI? → `src/components/common/`
 2. Is it feature-specific? → `src/features/[feature]/`
 3. Is it shared across features? → `src/shared/`
 4. Is it a route screen? → `src/pages/`
 5. Is it a layout? → `src/layouts/`
-
-
