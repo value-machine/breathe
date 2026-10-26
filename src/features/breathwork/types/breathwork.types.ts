@@ -25,9 +25,23 @@ export type BreathSettingsBounds = Record<keyof BreathSettings, { min: number; m
 
 export type BreathAudioMode = "headphones" | "speakers";
 
+/** An effect preset the user picks, or "custom" once the advanced Hz values are edited. */
+export type BreathEffectId = "calm" | "focus" | "sleep" | "energize" | "custom";
+
+/** One effect preset: the goal label, the band it synthesises, and its Hz values. */
+export interface BreathEffectPreset {
+  id: Exclude<BreathEffectId, "custom">;
+  label: string;
+  band: string;
+  carrierHz: number;
+  beatLowHz: number;
+  beatHighHz: number;
+}
+
 /** Audio settings the user can change. */
 export interface BreathAudioSettings {
   mode: BreathAudioMode;
+  effect: BreathEffectId;
   /** Tone heard in the left ear (headphones) or carried by the speaker (speakers), in Hz. */
   carrierHz: number;
   /** Beat frequency at the start of an inhale and the end of an exhale, in Hz. */
@@ -38,7 +52,7 @@ export interface BreathAudioSettings {
 
 /** Allowed range for each numeric audio setting. */
 export type BreathAudioSettingsBounds = Record<
-  Exclude<keyof BreathAudioSettings, "mode">,
+  Exclude<keyof BreathAudioSettings, "mode" | "effect">,
   { min: number; max: number }
 >;
 

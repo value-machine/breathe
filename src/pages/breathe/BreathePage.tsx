@@ -9,8 +9,10 @@ import {
   validateBreathSettings,
 } from "@/features/breathwork/services/breathSessionService";
 import {
+  audioSettingsForEffect,
   AUDIO_SETTINGS_BOUNDS,
   DEFAULT_AUDIO_SETTINGS,
+  EFFECT_PRESETS,
   validateAudioSettings,
 } from "@/features/breathwork/services/breathCueService";
 import type {
@@ -18,6 +20,7 @@ import type {
   BreathPhase,
   BreathSettings,
 } from "@/features/breathwork/types/breathwork.types";
+import { appScrollContentClassName } from "@/shared/theme/appViewLayout";
 
 /** Breathwork timer: settings first, then a session, then back to settings. */
 export const BreathePage = () => {
@@ -43,27 +46,33 @@ export const BreathePage = () => {
 
   if (sessionPhases) {
     return (
-      <BreathSessionScreen
-        phases={sessionPhases}
-        audio={breathAudio}
-        audioSettings={audio}
-        onExit={handleExit}
-      />
+      <div className={appScrollContentClassName}>
+        <BreathSessionScreen
+          phases={sessionPhases}
+          audio={breathAudio}
+          audioSettings={audio}
+          onExit={handleExit}
+        />
+      </div>
     );
   }
 
   return (
-    <BreathSettingsForm
-      settings={settings}
-      bounds={BREATH_SETTINGS_BOUNDS}
-      audio={audio}
-      audioBounds={AUDIO_SETTINGS_BOUNDS}
-      error={error}
-      soundOn={soundOn}
-      onSettingsChange={setSettings}
-      onAudioChange={setAudio}
-      onSoundToggle={() => setSoundOn((on) => !on)}
-      onPlay={handlePlay}
-    />
+    <div className={appScrollContentClassName}>
+      <BreathSettingsForm
+        settings={settings}
+        bounds={BREATH_SETTINGS_BOUNDS}
+        audio={audio}
+        audioBounds={AUDIO_SETTINGS_BOUNDS}
+        effectPresets={EFFECT_PRESETS}
+        onPickEffect={(effect) => setAudio(audioSettingsForEffect(effect, audio.mode))}
+        error={error}
+        soundOn={soundOn}
+        onSettingsChange={setSettings}
+        onAudioChange={setAudio}
+        onSoundToggle={() => setSoundOn((on) => !on)}
+        onPlay={handlePlay}
+      />
+    </div>
   );
 };

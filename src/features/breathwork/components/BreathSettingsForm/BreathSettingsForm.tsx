@@ -4,6 +4,8 @@ import { FormField } from "@/components/common/FormField";
 import type {
   BreathAudioSettings,
   BreathAudioSettingsBounds,
+  BreathEffectId,
+  BreathEffectPreset,
   BreathSettings,
   BreathSettingsBounds,
 } from "../../types/breathwork.types";
@@ -14,6 +16,8 @@ export interface BreathSettingsFormProps {
   bounds: BreathSettingsBounds;
   audio: BreathAudioSettings;
   audioBounds: BreathAudioSettingsBounds;
+  effectPresets: BreathEffectPreset[];
+  onPickEffect: (effect: Exclude<BreathEffectId, "custom">) => void;
   /** Validation message for the current settings, or null when they are valid. */
   error: string | null;
   soundOn: boolean;
@@ -38,6 +42,8 @@ export const BreathSettingsForm = ({
   bounds,
   audio,
   audioBounds,
+  effectPresets,
+  onPickEffect,
   error,
   soundOn,
   onSettingsChange,
@@ -68,7 +74,15 @@ export const BreathSettingsForm = ({
     <Button type="button" variant="outline" aria-pressed={soundOn} onClick={onSoundToggle}>
       Sound: {soundOn ? "on" : "off"}
     </Button>
-    {soundOn && <BreathAudioFields audio={audio} bounds={audioBounds} onChange={onAudioChange} />}
+    {soundOn && (
+      <BreathAudioFields
+        audio={audio}
+        bounds={audioBounds}
+        presets={effectPresets}
+        onPickEffect={onPickEffect}
+        onChange={onAudioChange}
+      />
+    )}
     {error && <Alert variant="destructive">{error}</Alert>}
     <Button type="submit" size="lg" disabled={error !== null}>
       Play

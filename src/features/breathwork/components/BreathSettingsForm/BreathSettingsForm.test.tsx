@@ -5,7 +5,11 @@ import {
   BREATH_SETTINGS_BOUNDS,
   DEFAULT_BREATH_SETTINGS,
 } from "../../services/breathSessionService";
-import { AUDIO_SETTINGS_BOUNDS, DEFAULT_AUDIO_SETTINGS } from "../../services/breathCueService";
+import {
+  AUDIO_SETTINGS_BOUNDS,
+  DEFAULT_AUDIO_SETTINGS,
+  EFFECT_PRESETS,
+} from "../../services/breathCueService";
 import { BreathSettingsForm } from "./BreathSettingsForm";
 
 const renderForm = (overrides: Partial<Parameters<typeof BreathSettingsForm>[0]> = {}) => {
@@ -14,6 +18,8 @@ const renderForm = (overrides: Partial<Parameters<typeof BreathSettingsForm>[0]>
     bounds: BREATH_SETTINGS_BOUNDS,
     audio: DEFAULT_AUDIO_SETTINGS,
     audioBounds: AUDIO_SETTINGS_BOUNDS,
+    effectPresets: EFFECT_PRESETS,
+    onPickEffect: vi.fn(),
     error: null,
     soundOn: true,
     onSettingsChange: vi.fn(),

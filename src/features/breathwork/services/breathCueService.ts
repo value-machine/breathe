@@ -2,17 +2,51 @@ import type {
   BreathAudioMode,
   BreathAudioSettings,
   BreathAudioSettingsBounds,
+  BreathEffectId,
+  BreathEffectPreset,
   BreathPhase,
 } from "../types/breathwork.types";
 
-export type { BreathAudioMode, BreathAudioSettings };
+export type { BreathAudioMode, BreathAudioSettings, BreathEffectId, BreathEffectPreset };
 
-export const DEFAULT_AUDIO_SETTINGS: BreathAudioSettings = {
-  mode: "headphones",
-  carrierHz: 200,
-  beatLowHz: 4,
-  beatHighHz: 10,
+/**
+ * Effect presets. The label names the goal the user picks; the band names what is synthesised
+ * (EEG band applied to a number, not a promise). Values are carrier and beat range in Hz.
+ */
+export const EFFECT_PRESETS: BreathEffectPreset[] = [
+  { id: "calm", label: "Calm", band: "theta", carrierHz: 200, beatLowHz: 4, beatHighHz: 8 },
+  { id: "focus", label: "Focus", band: "beta", carrierHz: 200, beatLowHz: 13, beatHighHz: 20 },
+  { id: "sleep", label: "Sleep", band: "delta", carrierHz: 150, beatLowHz: 1, beatHighHz: 4 },
+  {
+    id: "energize",
+    label: "Energize",
+    band: "beta / low gamma",
+    carrierHz: 250,
+    beatLowHz: 20,
+    beatHighHz: 30,
+  },
+];
+
+/** Settings for a chosen preset, keeping the output mode. */
+export const audioSettingsForEffect = (
+  effect: Exclude<BreathEffectId, "custom">,
+  mode: BreathAudioMode
+): BreathAudioSettings => {
+  const preset = EFFECT_PRESETS.find((p) => p.id === effect);
+  if (!preset) throw new Error(`Unknown effect: ${effect}`);
+  return {
+    mode,
+    effect,
+    carrierHz: preset.carrierHz,
+    beatLowHz: preset.beatLowHz,
+    beatHighHz: preset.beatHighHz,
+  };
 };
+
+export const DEFAULT_AUDIO_SETTINGS: BreathAudioSettings = audioSettingsForEffect(
+  "calm",
+  "headphones"
+);
 
 export const AUDIO_SETTINGS_BOUNDS: BreathAudioSettingsBounds = {
   carrierHz: { min: 100, max: 400 },
@@ -20,7 +54,13 @@ export const AUDIO_SETTINGS_BOUNDS: BreathAudioSettingsBounds = {
   beatHighHz: { min: 1, max: 40 },
 } as const;
 
-/** What to play for one phase. The beat ramps linearly from start to end over the phase. */
+/** Beat frequency at the start and end of a phase, in Hz. The beat ramps linearly between them. */
+export interface BeatRange {
+  startHz: number;
+  endHz: number;
+}
+
+/** What to play for one phase. */
 export interface BreathCueSpec {
   mode: BreathAudioMode;
   carrierHz: number;
@@ -36,42 +76,59 @@ const HOLD_GAIN_SHARE = 0.5;
 const CROSSFADE_SECONDS = 0.3;
 const SILENCE_GAIN = 0.0001;
 
-/**
- * Cue for a phase. The beat rises across an inhale and falls across an exhale. A hold keeps the
- * beat where the previous breath ended, so the sound does not jump at the phase boundary.
- */
+/** Cue for a phase: the given beat range and the level for the phase kind. */
 export const cueForPhase = (
   phase: BreathPhase,
   audio: BreathAudioSettings,
-  beatBeforeHz: number
-): BreathCueSpec => {
-  const base = {
-    mode: audio.mode,
-    carrierHz: audio.carrierHz,
-    seconds: phase.seconds,
-  };
-  if (phase.kind === "inhale") {
-    return {
-      ...base,
-      beatStartHz: audio.beatLowHz,
-      beatEndHz: audio.beatHighHz,
-      peakGain: BREATH_PEAK_GAIN,
+  beat: BeatRange
+): BreathCueSpec => ({
+  mode: audio.mode,
+  carrierHz: audio.carrierHz,
+  beatStartHz: beat.startHz,
+  beatEndHz: beat.endHz,
+  seconds: phase.seconds,
+  peakGain: phase.kind === "hold" ? BREATH_PEAK_GAIN * HOLD_GAIN_SHARE : BREATH_PEAK_GAIN,
+});
+
+/**
+ * Breath swing: how far the beat moves above and below the session trend on each breath. A
+ * quarter of the range keeps the whole movement inside beat low to beat high.
+ */
+const breathSwingHz = (audio: BreathAudioSettings): number =>
+  (audio.beatHighHz - audio.beatLowHz) / 4;
+
+/**
+ * Session trend: the centre of the beat, moving linearly from the high end to the low end over
+ * the whole session. Guides the listener from the higher beat toward the lower one.
+ */
+const trendHz = (audio: BreathAudioSettings, elapsed: number, total: number): number => {
+  const swing = breathSwingHz(audio);
+  const from = audio.beatHighHz - swing;
+  const to = audio.beatLowHz + swing;
+  return from + (to - from) * (total > 0 ? elapsed / total : 0);
+};
+
+/**
+ * Beat range for each phase, in order. Each breath swings above (after an inhale) or below
+ * (after an exhale) the trend. A hold keeps the side of the last breath and follows the trend.
+ * Every phase starts where the previous one ended, so the beat is continuous.
+ */
+const beatRangesForSession = (phases: BreathPhase[], audio: BreathAudioSettings): BeatRange[] => {
+  const swing = breathSwingHz(audio);
+  const total = phases.reduce((sum, phase) => sum + phase.seconds, 0);
+  let elapsed = 0;
+  let side: 1 | -1 = -1;
+  return phases.map((phase) => {
+    const startSide = side;
+    const endSide = phase.kind === "inhale" ? 1 : phase.kind === "exhale" ? -1 : startSide;
+    const range = {
+      startHz: trendHz(audio, elapsed, total) + startSide * swing,
+      endHz: trendHz(audio, elapsed + phase.seconds, total) + endSide * swing,
     };
-  }
-  if (phase.kind === "exhale") {
-    return {
-      ...base,
-      beatStartHz: audio.beatHighHz,
-      beatEndHz: audio.beatLowHz,
-      peakGain: BREATH_PEAK_GAIN,
-    };
-  }
-  return {
-    ...base,
-    beatStartHz: beatBeforeHz,
-    beatEndHz: beatBeforeHz,
-    peakGain: BREATH_PEAK_GAIN * HOLD_GAIN_SHARE,
-  };
+    side = endSide;
+    elapsed += phase.seconds;
+    return range;
+  });
 };
 
 /**
@@ -103,8 +160,9 @@ const createIsochronicVoice = (ctx: AudioContext, carrierHz: number): Voice => {
   const modulation = ctx.createGain();
   const depth = ctx.createGain();
   carrier.frequency.value = carrierHz;
-  modulation.gain.value = 0.5;
-  depth.gain.value = 0.5;
+  // Base 0.7 with depth 0.3 keeps the level between 0.4 and 1, so the tone pulses instead of gating off.
+  modulation.gain.value = 0.7;
+  depth.gain.value = 0.3;
   carrier.connect(modulation);
   lfo.connect(depth);
   depth.connect(modulation.gain);
@@ -116,15 +174,11 @@ const createVoice = (ctx: AudioContext, audio: BreathAudioSettings): Voice =>
     ? createBinauralVoice(ctx, audio.carrierHz)
     : createIsochronicVoice(ctx, audio.carrierHz);
 
-/** Beat and level for each phase, in order. The beat carries from one phase into the next. */
-const cuesForSession = (phases: BreathPhase[], audio: BreathAudioSettings): BreathCueSpec[] => {
-  let beatHz = audio.beatLowHz;
-  return phases.map((phase) => {
-    const cue = cueForPhase(phase, audio, beatHz);
-    beatHz = cue.beatEndHz;
-    return cue;
-  });
-};
+/** Cue for each phase, in order, from the session beat plan. */
+const cuesForSession = (phases: BreathPhase[], audio: BreathAudioSettings): BreathCueSpec[] =>
+  beatRangesForSession(phases, audio).map((range, index) =>
+    cueForPhase(phases[index], audio, range)
+  );
 
 /** Automates the beat across the session. Each phase starts where the previous one ended. */
 const scheduleSessionBeat = (voice: Voice, cues: BreathCueSpec[], startAt: number): void => {

@@ -7,7 +7,7 @@ A guided breathing session: the user sets the breathing pattern (breaths before 
 ## Structure
 
 - `services/breathSessionService.ts`: pure session engine. Settings validation and bounds, hold progression (D4), the phase list, progress/advance helpers, circle scale and round progress. No React.
-- `services/breathCueService.ts`: pure audio cue spec per phase (beat rises on inhale, falls on exhale, stays low on hold) and the Web Audio scheduler. Headphones mode plays a binaural beat (carrier left, carrier plus beat right). Speakers mode modulates one carrier at the beat rate. The whole session is one continuous voice (two oscillators, not one pair per phase), scheduled at Play on the AudioContext clock. The beat carries across phases, a hold keeps the beat where the previous breath ended, and each level change is a 0.3 s crossfade. No timers in the audio path.
+- `services/breathCueService.ts`: pure audio cue spec per phase (beat rises on inhale, falls on exhale, stays low on hold) and the Web Audio scheduler. Headphones mode plays a binaural beat (carrier left, carrier plus beat right). Speakers mode modulates one carrier at the beat rate. The whole session is one continuous voice (two oscillators, not one pair per phase), scheduled at Play on the AudioContext clock. The beat follows a session trend that moves linearly from the high end of the range to the low end over the whole session. Each breath swings a quarter of the range above (after an inhale) or below (after an exhale) that trend; a hold keeps the side of the last breath. Every phase starts where the previous one ended, and each level change is a 0.3 s crossfade. In speakers mode the carrier pulses between 0.4 and 1 of its level, so it does not gate off. No timers in the audio path.
 - `hooks/useBreathSession.ts`: runs a phase list with pause, resume and stop. Time comes from `performance.now()`.
 - `hooks/useBreathAudio.ts`: owns one AudioContext per session. Created inside the Play click, suspended on pause, resumed on resume, closed on exit. Does nothing when sound is off.
 - Circle and bar are driven by the session clock, not by CSS phase transitions. The circle scale moves across the whole inhale (0.5 → 1) and exhale (1 → 0.5), and a hold keeps the size of the last breath. The round bar shows the share of the current round that has elapsed. Pause freezes both with the countdown.
@@ -19,7 +19,7 @@ Tests are colocated with their module (`*.test.ts(x)`). Engine and audio tests r
 
 Settings and audio settings are component state only (no storage).
 
-Audio defaults: carrier 200 Hz (100–400), beat 4 Hz at the low point and 10 Hz at the high point (1–40). Headphones mode is the default. Overtone layers are not implemented.
+Effects: the user picks one of four presets (Calm, Focus, Sleep, Energize). Each sets a carrier and beat range (`EFFECT_PRESETS` in `breathCueService.ts`) and is labelled with the band it synthesises, not with an effect claim. The Hz fields sit behind "Advanced"; editing one switches the effect to "custom". Headphones mode is the default. Overtone layers are not implemented.
 
 ## Dependencies
 
