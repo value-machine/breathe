@@ -1,5 +1,15 @@
 [
   {
+    "title": "Build breathwork timer app (settings, breathing timer, sound cues)",
+    "description": "Build the breathwork timer per documentation/DOC_APP_VISION.md (§ Core session flow, § Design direction): a settings page (breaths before hold, inhale/exhale time, hold target, rounds, sound on/off), a breathing timer page with an expanding/contracting circle, round progress, play/pause/stop, sound cues per phase, and the hold progression (1/3, 2/3, full target; fixed 15 s hold). Stack and architecture follow this repo. Starts with loop-refine.",
+    "status": "in-progress"
+  },
+  {
+    "title": "Breathwork sound cues (Web Audio or Tone.js)",
+    "description": "Second lap of the breathwork timer. Rising soft tone on inhale, falling soft tone on exhale, subtle or silent drone during holds, wired to the sound on/off switch on the settings page (documentation/DOC_APP_VISION.md, design direction). Owner question to resolve at refine: Web Audio API (no new dependency) or Tone.js (named in the design, new dependency). Lap 1 is temp_job_breathwork-timer.",
+    "status": "to-do"
+  },
+  {
     "title": "Fix Google sign-in returning to the wrong site with a PKCE error",
     "description": "Seen on the production site after signing in with Google from a preview: 'PKCE code verifier not found in storage'. Supabase auth logs show the sign-in started on the preview origin, Supabase redirected to the Site URL (production) because the app's bare-origin redirect address did not match the '/**' allow-list pattern, and production then failed with bad_code_verifier. The app also exchanges the code twice (supabase-js does it during client init, then the callback hook again), which would show a false error even when sign-in works. Lap: documentation/jobs/temp_job_google-signin-return/BRIEF.md.",
     "status": "in-progress"

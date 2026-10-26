@@ -1,0 +1,43 @@
+import { useEffect } from "react";
+import { useBreathSession } from "../../hooks/useBreathSession";
+import type { BreathPhase } from "../../types/breathwork.types";
+import { BreathTimerView } from "../BreathTimerView/BreathTimerView";
+
+export interface BreathSessionScreenProps {
+  phases: BreathPhase[];
+  /** Called when the session finishes or the user stops it. */
+  onExit: () => void;
+}
+
+/** Runs one breathing session from start to finish and reports when it is over. */
+export const BreathSessionScreen = ({ phases, onExit }: BreathSessionScreenProps) => {
+  const session = useBreathSession(phases);
+  const { start, stop, status } = session;
+
+  useEffect(() => {
+    start();
+  }, [start]);
+
+  useEffect(() => {
+    if (status === "finished") onExit();
+  }, [status, onExit]);
+
+  const handleStop = (): void => {
+    stop();
+    onExit();
+  };
+
+  return (
+    <BreathTimerView
+      status={status}
+      current={session.current}
+      circleExpanded={session.circleExpanded}
+      phaseRemainingSeconds={session.phaseRemainingSeconds}
+      roundsRemaining={session.roundsRemaining}
+      totalRounds={phases[phases.length - 1]?.round ?? 0}
+      onPause={session.pause}
+      onResume={session.resume}
+      onStop={handleStop}
+    />
+  );
+};
