@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Fix Google sign-in returning to the wrong site with a PKCE error",
+    "description": "Seen on the production site after signing in with Google from a preview: 'PKCE code verifier not found in storage'. Supabase auth logs show the sign-in started on the preview origin, Supabase redirected to the Site URL (production) because the app's bare-origin redirect address did not match the '/**' allow-list pattern, and production then failed with bad_code_verifier. The app also exchanges the code twice (supabase-js does it during client init, then the callback hook again), which would show a false error even when sign-in works. Lap: documentation/jobs/temp_job_google-signin-return/BRIEF.md.",
+    "status": "in-progress"
+  },
+  {
+    "title": "Configure Supabase",
+    "description": "Set up the backend: one Supabase project with the auth providers you use enabled, its Site URL set to the app's primary origin, and its URL and publishable key available as VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (local .env, plus the hosting build variables for main and for previews). Before the app has real users, isolate staging from production with a Supabase Branching staging branch or a second project (documentation/DOC_CLOUDFLARE_WORKERS.md § Staging backend). Your coding agent lists the exact requirements, checks the result, and tells you what only you can do. For Google sign-in, requirements are in documentation/DOC_SUPABASE_GOOGLE_OAUTH.md. Agent gate: .agents/skills/loop-backlog/references/onboarding.md § Configuration tasks gate (Supabase).",
+    "status": "to-do"
+  },
+  {
+    "title": "Put your app online (Cloudflare hosting)",
+    "description": "Get your app live on the internet with Cloudflare (free tier is fine). Your coding agent does the setup — just ask it to \"do the hosting task\". What you need ready: a Cloudflare account, your Supabase keys already in .env, and (optional) a domain name you own. How it works once set up depends on your git workflow mode (see .claude/rules/git-workflow.md § Mode behavior table, rows staging and production) — by default every pull request gets its own preview link and merging the pull request ships to production. One step happens in the Cloudflare website (connecting your repo); the agent tells you what must be set there and why, waits for you, and checks the result. Agent playbook + troubleshooting: documentation/DOC_CLOUDFLARE_WORKERS.md (see \"Agent one-shot brief\"). Agent gate: .agents/skills/loop-backlog/references/onboarding.md § Configuration tasks gate (Hosting).",
+    "status": "to-do"
+  },
+  {
+    "title": "Define app vision",
+    "description": "Collaborate with the coding agent to fill documentation/DOC_APP_VISION.md (problem, persona, app role). Replace placeholder bullets with real prose and change Vision status from DRAFT to ACTIVE when complete. Agent gate: .agents/skills/loop-backlog/references/onboarding.md § App vision & goals gate.",
+    "status": "to-do"
+  },
+  {
+    "title": "Configure Theme",
+    "description": "Restyle the app via the design token files in src/shared/theme/tokens/ (light and dark colors, plus a base file for radius, density, fonts), then run pnpm tokens:build. See documentation/DOC_THEMING.md. Verify both modes with the theme icon in the profile menu. Agent gate: .agents/skills/loop-backlog/references/onboarding.md § Configuration tasks gate (Theme).",
+    "status": "to-do"
+  },
+  {
+    "title": "In-app feedback widget",
+    "description": "A small signed-in feedback form that writes to app_feedback with the page and environment. Depends on: Signals backend task.",
+    "status": "to-do"
+  },
+  {
+    "title": "Admin signals view and switch the signal adapter on",
+    "description": "An admin-only view (role claim) to triage error clusters and feedback, and turn on loop-backlog's signal adapter so open signals become ranked backlog tasks. Depends on: Signals backend, error capture and feedback widget tasks.",
+    "status": "to-do"
+  },
+  {
+    "title": "Add a db:push-staging script or fix the adapter reference",
+    "description": "The signal adapter (.agents/skills/loop-backlog/references/signal-adapter.md) tells the agent to run `pnpm run db:push-staging`, which does not exist. Either add a script that applies supabase/migrations to the staging project with a pinned Supabase CLI (needs project linking, which the owner must set up), or change the adapter to say the connector or CLI applies migrations. Protected file edit: needs owner approval. Context: documentation/DOC_DECISION_LOG.md § signals-backend D8.",
+    "status": "to-do"
+  },
+  {
+    "title": "Decide whether the app uses anonymous sign-ins",
+    "description": "The app asks Supabase for an anonymous session on every visit and Supabase refuses (anonymous_provider_disabled, HTTP 422), twice per page load. Either enable anonymous sign-ins in the project (anonymous users get the authenticated role, so the feedback policy would admit them; review RLS first) or remove the call. Auth permission model: needs an owner decision.",
+    "status": "to-do"
+  },
+  {
+    "title": "Remove the harness overview card before launching your product",
+    "description": "The home page shows a welcome card pointing at the /harness overview route (src/features/harness-overview/). Delete that feature folder, src/pages/HarnessOverviewPage.tsx and its test, the /harness route in src/App.tsx, the card line in src/pages/HomePage.tsx and public/harness-overview.png when the app should show your own product instead; then drop the image from README.md and the row from documentation/DOC_INDEX.md.",
+    "status": "to-do"
+  }
+]
