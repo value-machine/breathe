@@ -31,9 +31,9 @@ export const BreathSessionScreen = ({ phases, onExit }: BreathSessionScreenProps
     <BreathTimerView
       status={status}
       current={session.current}
-      circleExpanded={session.circleExpanded}
+      circleScale={session.circleScale}
+      roundProgress={session.roundProgress}
       phaseRemainingSeconds={session.phaseRemainingSeconds}
-      roundsRemaining={session.roundsRemaining}
       totalRounds={phases[phases.length - 1]?.round ?? 0}
       onPause={session.pause}
       onResume={session.resume}

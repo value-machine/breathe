@@ -6,9 +6,9 @@ import { BreathTimerView, type BreathTimerViewProps } from "./BreathTimerView";
 const baseProps: BreathTimerViewProps = {
   status: "running",
   current: { kind: "inhale", seconds: 4, round: 1 },
-  circleExpanded: true,
+  circleScale: 0.75,
+  roundProgress: 0.25,
   phaseRemainingSeconds: 3,
-  roundsRemaining: 2,
   totalRounds: 3,
   onPause: vi.fn(),
   onResume: vi.fn(),
@@ -21,6 +21,16 @@ describe("BreathTimerView", () => {
 
     expect(screen.getByText("Breathe in")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
+  });
+
+  it("should show progress within the current round when a round is running", () => {
+    render(<BreathTimerView {...baseProps} roundProgress={0.4} />);
+
+    expect(screen.getByRole("progressbar", { name: "Progress in this round" })).toHaveAttribute(
+      "aria-valuenow",
+      "40"
+    );
+    expect(screen.getByText("Round 1 of 3")).toBeInTheDocument();
   });
 
   it("should call onPause when Pause is pressed during a running session", async () => {

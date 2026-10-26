@@ -82,4 +82,37 @@ describe("useBreathSession", () => {
     expect(result.current.status).toBe("idle");
     expect(result.current.current).toBeNull();
   });
+
+  it("should grow the circle gradually across the inhale when half of the inhale has passed", () => {
+    const { result } = renderHook(() => useBreathSession(SHORT_PHASES));
+    act(() => result.current.start());
+
+    advance(500);
+
+    expect(result.current.current).toEqual(SHORT_PHASES[0]);
+    expect(result.current.circleScale).toBeCloseTo(0.75, 1);
+  });
+
+  it("should report the share of the round that has elapsed when part of the round has passed", () => {
+    const { result } = renderHook(() => useBreathSession(SHORT_PHASES));
+    act(() => result.current.start());
+
+    advance(6000);
+
+    expect(result.current.roundProgress).toBeCloseTo(0.25, 2);
+  });
+
+  it("should freeze the circle and round progress when paused", () => {
+    const { result } = renderHook(() => useBreathSession(SHORT_PHASES));
+    act(() => result.current.start());
+    advance(500);
+    act(() => result.current.pause());
+    const scaleAtPause = result.current.circleScale;
+    const progressAtPause = result.current.roundProgress;
+
+    advance(5000);
+
+    expect(result.current.circleScale).toBe(scaleAtPause);
+    expect(result.current.roundProgress).toBe(progressAtPause);
+  });
 });

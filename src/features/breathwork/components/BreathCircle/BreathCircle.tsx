@@ -1,18 +1,16 @@
-import { cn } from "@/shared/utils/cn";
-
 export interface BreathCircleProps {
-  /** true = fully expanded (after an inhale); false = contracted (after an exhale). */
-  expanded: boolean;
+  /** Scale factor from CIRCLE_MIN_SCALE (contracted) to CIRCLE_MAX_SCALE (expanded). */
+  scale: number;
 }
 
-/** Breathing guide: a circle that grows on inhale and shrinks on exhale, with smooth transitions. */
-export const BreathCircle = ({ expanded }: BreathCircleProps) => (
+/**
+ * Breathing guide: the circle follows the breath through the whole inhale and exhale.
+ * The scale is driven by the session clock, so it pauses together with the countdown.
+ */
+export const BreathCircle = ({ scale }: BreathCircleProps) => (
   <div
     aria-hidden="true"
-    data-expanded={expanded}
-    className={cn(
-      "size-64 rounded-full bg-secondary ring-4 ring-primary/40 transition-transform ease-standard duration-(--duration-slow) motion-reduce:transition-none",
-      expanded ? "scale-100" : "scale-50"
-    )}
+    className="size-64 rounded-full bg-secondary ring-4 ring-primary/40 transition-transform duration-100 ease-linear motion-reduce:transition-none"
+    style={{ transform: `scale(${scale})` }}
   />
 );

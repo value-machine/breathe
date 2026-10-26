@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   advanceBreathProgress,
-  isCircleExpanded,
+  CIRCLE_MIN_SCALE,
+  circleScaleAt,
+  roundProgressAt,
   startBreathProgress,
   type BreathSessionProgress,
 } from "../services/breathSessionService";
@@ -19,13 +21,13 @@ interface SessionState {
 
 export interface UseBreathSessionResult {
   status: BreathSessionStatus;
+  /** Phase being played, or null when the session is idle or finished. */
   current: BreathPhase | null;
-  phaseIndex: number;
-  /** Whether the breathing circle is expanded at the current phase. */
-  circleExpanded: boolean;
+  /** Circle scale at this moment, from CIRCLE_MIN_SCALE to CIRCLE_MAX_SCALE. */
+  circleScale: number;
+  /** Share of the current round that has elapsed, from 0 to 1. */
+  roundProgress: number;
   phaseRemainingSeconds: number;
-  /** Rounds from the current one through the last, counting the current round. */
-  roundsRemaining: number;
   start: () => void;
   pause: () => void;
   resume: () => void;
@@ -82,15 +84,13 @@ export const useBreathSession = (phases: BreathPhase[]): UseBreathSessionResult 
     setSession({ status: "idle", progress: startBreathProgress(phases) });
   }, [phases]);
 
-  const current = phases[session.progress.phaseIndex] ?? null;
-  const lastRound = phases[phases.length - 1]?.round ?? 0;
+  const isLive = session.status === "running" || session.status === "paused";
   return {
     status: session.status,
-    current: session.status === "idle" || session.status === "finished" ? null : current,
-    phaseIndex: session.progress.phaseIndex,
-    circleExpanded: isCircleExpanded(phases, session.progress.phaseIndex),
+    current: isLive ? (phases[session.progress.phaseIndex] ?? null) : null,
+    circleScale: isLive ? circleScaleAt(phases, session.progress) : CIRCLE_MIN_SCALE,
+    roundProgress: isLive ? roundProgressAt(phases, session.progress) : 0,
     phaseRemainingSeconds: Math.ceil(session.progress.remainingMs / 1000),
-    roundsRemaining: current ? lastRound - current.round + 1 : 0,
     start,
     pause,
     resume,
