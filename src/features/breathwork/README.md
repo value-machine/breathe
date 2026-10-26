@@ -19,7 +19,7 @@ Tests are colocated with their module (`*.test.ts(x)`). Engine and audio tests r
 
 Settings and audio settings are component state only (no storage).
 
-Audio defaults: carrier 200 Hz (100–400), beat 4 Hz at the low point and 10 Hz at the high point (1–40). Headphones mode is the default. Overtone layers are not implemented.
+Effects: the user picks one of four presets (Calm, Focus, Sleep, Energize). Each sets a carrier and beat range (`EFFECT_PRESETS` in `breathCueService.ts`) and is labelled with the band it synthesises, not with an effect claim. The Hz fields sit behind "Advanced"; editing one switches the effect to "custom". Headphones mode is the default. Overtone layers are not implemented.
 
 ## Dependencies
 

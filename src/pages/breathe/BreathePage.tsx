@@ -9,8 +9,10 @@ import {
   validateBreathSettings,
 } from "@/features/breathwork/services/breathSessionService";
 import {
+  audioSettingsForEffect,
   AUDIO_SETTINGS_BOUNDS,
   DEFAULT_AUDIO_SETTINGS,
+  EFFECT_PRESETS,
   validateAudioSettings,
 } from "@/features/breathwork/services/breathCueService";
 import type {
@@ -58,6 +60,8 @@ export const BreathePage = () => {
       bounds={BREATH_SETTINGS_BOUNDS}
       audio={audio}
       audioBounds={AUDIO_SETTINGS_BOUNDS}
+      effectPresets={EFFECT_PRESETS}
+      onPickEffect={(effect) => setAudio(audioSettingsForEffect(effect, audio.mode))}
       error={error}
       soundOn={soundOn}
       onSettingsChange={setSettings}

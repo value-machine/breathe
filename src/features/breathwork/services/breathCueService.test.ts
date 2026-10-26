@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import type { BreathPhase } from "../types/breathwork.types";
 import {
+  audioSettingsForEffect,
   cueForPhase,
   DEFAULT_AUDIO_SETTINGS,
+  EFFECT_PRESETS,
   scheduleBreathSession,
   validateAudioSettings,
   type BreathAudioSettings,
@@ -19,7 +21,7 @@ describe("cueForPhase", () => {
       mode: "headphones",
       carrierHz: 200,
       beatStartHz: 4,
-      beatEndHz: 10,
+      beatEndHz: 8,
       seconds: 4,
       peakGain: 0.15,
     });
@@ -29,7 +31,7 @@ describe("cueForPhase", () => {
     const phase: BreathPhase = { kind: "exhale", seconds: 6, round: 1 };
 
     expect(cueForPhase(phase, HEADPHONES, HEADPHONES.beatLowHz)).toMatchObject({
-      beatStartHz: 10,
+      beatStartHz: 8,
       beatEndHz: 4,
       seconds: 6,
     });
@@ -49,8 +51,8 @@ describe("cueForPhase", () => {
     const phase: BreathPhase = { kind: "hold", seconds: 15, round: 1 };
 
     expect(cueForPhase(phase, HEADPHONES, HEADPHONES.beatHighHz)).toMatchObject({
-      beatStartHz: 10,
-      beatEndHz: 10,
+      beatStartHz: 8,
+      beatEndHz: 8,
     });
   });
 
@@ -64,7 +66,11 @@ describe("cueForPhase", () => {
     const phase: BreathPhase = { kind: "inhale", seconds: 4, round: 1 };
 
     expect(
-      cueForPhase(phase, { mode: "headphones", carrierHz: 300, beatLowHz: 2, beatHighHz: 6 }, 2)
+      cueForPhase(
+        phase,
+        { mode: "headphones", effect: "custom", carrierHz: 300, beatLowHz: 2, beatHighHz: 6 },
+        2
+      )
     ).toMatchObject({ carrierHz: 300, beatStartHz: 2, beatEndHz: 6 });
   });
 });
@@ -115,7 +121,7 @@ describe("scheduleBreathSession", () => {
     expect(ctx.createChannelMerger).toHaveBeenCalledWith(2);
     expect(left.frequency.setValueAtTime).not.toHaveBeenCalled();
     expect(right.frequency.setValueAtTime).toHaveBeenCalledWith(204, 10);
-    expect(right.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(210, 12);
+    expect(right.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(208, 12);
   });
 
   it("should keep the beat steady through the hold when the hold follows an inhale", () => {
@@ -124,8 +130,8 @@ describe("scheduleBreathSession", () => {
     scheduleBreathSession(ctx as unknown as AudioContext, TWO_PHASES, HEADPHONES);
 
     const [, right] = oscillators;
-    expect(right.frequency.setValueAtTime).toHaveBeenCalledWith(210, 12);
-    expect(right.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(210, 15);
+    expect(right.frequency.setValueAtTime).toHaveBeenCalledWith(208, 12);
+    expect(right.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(208, 15);
   });
 
   it("should use two oscillators for the whole session when there are many phases", () => {
@@ -167,7 +173,39 @@ describe("scheduleBreathSession", () => {
     const [, lfo] = oscillators;
     expect(ctx.createChannelMerger).not.toHaveBeenCalled();
     expect(lfo.frequency.setValueAtTime).toHaveBeenCalledWith(4, 10);
-    expect(lfo.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(10, 12);
+    expect(lfo.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(8, 12);
+  });
+});
+
+describe("effect presets", () => {
+  const FORBIDDEN_CLAIMS = /heal|cure|treat|therap|anxiety|relax|sleep aid|improve|boost|enhance/i;
+
+  it("should keep every preset inside the Hz bounds when presets are listed", () => {
+    for (const preset of EFFECT_PRESETS) {
+      expect(validateAudioSettings(audioSettingsForEffect(preset.id, "headphones"))).toBeNull();
+    }
+  });
+
+  it("should keep the beat low below the beat high when a preset is listed", () => {
+    for (const preset of EFFECT_PRESETS) {
+      expect(preset.beatLowHz).toBeLessThan(preset.beatHighHz);
+    }
+  });
+
+  it("should use the preset values and keep the output mode when an effect is chosen", () => {
+    expect(audioSettingsForEffect("sleep", "speakers")).toEqual({
+      mode: "speakers",
+      effect: "sleep",
+      carrierHz: 150,
+      beatLowHz: 1,
+      beatHighHz: 4,
+    });
+  });
+
+  it("should contain no health or effect claims when labels and bands are listed", () => {
+    for (const preset of EFFECT_PRESETS) {
+      expect(`${preset.label} ${preset.band}`).not.toMatch(FORBIDDEN_CLAIMS);
+    }
   });
 });
 

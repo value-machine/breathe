@@ -2,17 +2,51 @@ import type {
   BreathAudioMode,
   BreathAudioSettings,
   BreathAudioSettingsBounds,
+  BreathEffectId,
+  BreathEffectPreset,
   BreathPhase,
 } from "../types/breathwork.types";
 
-export type { BreathAudioMode, BreathAudioSettings };
+export type { BreathAudioMode, BreathAudioSettings, BreathEffectId, BreathEffectPreset };
 
-export const DEFAULT_AUDIO_SETTINGS: BreathAudioSettings = {
-  mode: "headphones",
-  carrierHz: 200,
-  beatLowHz: 4,
-  beatHighHz: 10,
+/**
+ * Effect presets. The label names the goal the user picks; the band names what is synthesised
+ * (EEG band applied to a number, not a promise). Values are carrier and beat range in Hz.
+ */
+export const EFFECT_PRESETS: BreathEffectPreset[] = [
+  { id: "calm", label: "Calm", band: "theta", carrierHz: 200, beatLowHz: 4, beatHighHz: 8 },
+  { id: "focus", label: "Focus", band: "beta", carrierHz: 200, beatLowHz: 13, beatHighHz: 20 },
+  { id: "sleep", label: "Sleep", band: "delta", carrierHz: 150, beatLowHz: 1, beatHighHz: 4 },
+  {
+    id: "energize",
+    label: "Energize",
+    band: "beta / low gamma",
+    carrierHz: 250,
+    beatLowHz: 20,
+    beatHighHz: 30,
+  },
+];
+
+/** Settings for a chosen preset, keeping the output mode. */
+export const audioSettingsForEffect = (
+  effect: Exclude<BreathEffectId, "custom">,
+  mode: BreathAudioMode
+): BreathAudioSettings => {
+  const preset = EFFECT_PRESETS.find((p) => p.id === effect);
+  if (!preset) throw new Error(`Unknown effect: ${effect}`);
+  return {
+    mode,
+    effect,
+    carrierHz: preset.carrierHz,
+    beatLowHz: preset.beatLowHz,
+    beatHighHz: preset.beatHighHz,
+  };
 };
+
+export const DEFAULT_AUDIO_SETTINGS: BreathAudioSettings = audioSettingsForEffect(
+  "calm",
+  "headphones"
+);
 
 export const AUDIO_SETTINGS_BOUNDS: BreathAudioSettingsBounds = {
   carrierHz: { min: 100, max: 400 },
