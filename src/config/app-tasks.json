@@ -1,8 +1,8 @@
 [
   {
     "title": "Breathwork sound cues (Web Audio or Tone.js)",
-    "description": "Second lap of the breathwork timer. Rising soft tone on inhale, falling soft tone on exhale, subtle or silent drone during holds, wired to the sound on/off switch on the settings page (documentation/DOC_APP_VISION.md, design direction). Owner question to resolve at refine: Web Audio API (no new dependency) or Tone.js (named in the design, new dependency). Lap 1 is temp_job_breathwork-timer.",
-    "status": "to-do"
+    "description": "Second lap of the breathwork timer. Rising soft tone on inhale, falling soft tone on exhale, subtle or silent drone during holds, wired to the sound on/off switch on the settings page (documentation/DOC_APP_VISION.md, design direction). Decided at refine: Web Audio API, no new dependency (D11). Binaural beats in headphones mode, isochronic tone in speakers mode. Lap 1 is temp_job_breathwork-timer.",
+    "status": "in-progress"
   },
   {
     "title": "Fix Google sign-in returning to the wrong site with a PKCE error",
