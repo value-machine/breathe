@@ -128,7 +128,7 @@ describe("roundProgressAt", () => {
     expect(roundProgressAt(phases, { phaseIndex: 2, remainingMs: 4000 })).toBe(0);
   });
 
-  it("should report the share of the current round including the time already spent in the round", () => {
+  it("should report the share of the current round including earlier phases when the round is midway", () => {
     expect(roundProgressAt(phases, { phaseIndex: 3, remainingMs: 2000 })).toBeCloseTo(0.75);
   });
 });

@@ -15,6 +15,8 @@ A guided breathing session: the user sets the breathing pattern (breaths before 
 - `types/breathwork.types.ts`: `BreathSettings`, `BreathPhase`, the audio types (`BreathAudioSettings`, `BreathAudioMode`) and the validation result type. Components import types from here; bounds come from the page as props.
 - Page: `src/pages/breathe/BreathePage.tsx`, mounted at `/breathe`. It owns the audio controller and the audio settings.
 
+Tests are colocated with their module (`*.test.ts(x)`). Engine and audio tests run without a browser; the audio scheduler is tested against a fake AudioContext.
+
 Settings and audio settings are component state only (no storage).
 
 Audio defaults: carrier 200 Hz (100–400), beat 4 Hz at the low point and 10 Hz at the high point (1–40). Headphones mode is the default. Overtone layers are not implemented.

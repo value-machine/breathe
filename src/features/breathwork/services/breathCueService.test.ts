@@ -149,7 +149,7 @@ describe("scheduleBreathSession", () => {
     for (const osc of oscillators) expect(osc.stop).toHaveBeenCalledWith(15);
   });
 
-  it("should crossfade the level from the inhale peak to the hold level at the phase boundary", () => {
+  it("should crossfade the level from the inhale peak to the hold level when a hold follows an inhale", () => {
     const { ctx } = createFakeContext();
 
     scheduleBreathSession(ctx as unknown as AudioContext, TWO_PHASES, HEADPHONES);
