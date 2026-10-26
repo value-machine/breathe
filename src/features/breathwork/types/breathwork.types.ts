@@ -23,6 +23,25 @@ export interface BreathPhase {
 /** Allowed range for each numeric setting. */
 export type BreathSettingsBounds = Record<keyof BreathSettings, { min: number; max: number }>;
 
+export type BreathAudioMode = "headphones" | "speakers";
+
+/** Audio settings the user can change. */
+export interface BreathAudioSettings {
+  mode: BreathAudioMode;
+  /** Tone heard in the left ear (headphones) or carried by the speaker (speakers), in Hz. */
+  carrierHz: number;
+  /** Beat frequency at the start of an inhale and the end of an exhale, in Hz. */
+  beatLowHz: number;
+  /** Beat frequency at the end of an inhale and the start of an exhale, in Hz. */
+  beatHighHz: number;
+}
+
+/** Allowed range for each numeric audio setting. */
+export type BreathAudioSettingsBounds = Record<
+  Exclude<keyof BreathAudioSettings, "mode">,
+  { min: number; max: number }
+>;
+
 export type BreathSettingsResult =
   | { ok: true; value: BreathSettings }
   | { ok: false; error: string };

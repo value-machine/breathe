@@ -1,15 +1,24 @@
 import { Alert } from "@/components/common/Alert";
 import { Button } from "@/components/common/Button";
 import { FormField } from "@/components/common/FormField";
-import type { BreathSettings, BreathSettingsBounds } from "../../types/breathwork.types";
+import type {
+  BreathAudioSettings,
+  BreathAudioSettingsBounds,
+  BreathSettings,
+  BreathSettingsBounds,
+} from "../../types/breathwork.types";
+import { BreathAudioFields } from "../BreathAudioFields/BreathAudioFields";
 
 export interface BreathSettingsFormProps {
   settings: BreathSettings;
   bounds: BreathSettingsBounds;
+  audio: BreathAudioSettings;
+  audioBounds: BreathAudioSettingsBounds;
   /** Validation message for the current settings, or null when they are valid. */
   error: string | null;
   soundOn: boolean;
   onSettingsChange: (next: BreathSettings) => void;
+  onAudioChange: (next: BreathAudioSettings) => void;
   onSoundToggle: () => void;
   onPlay: () => void;
 }
@@ -23,13 +32,16 @@ const FIELDS: { key: NumericSetting; label: string }[] = [
   { key: "rounds", label: "Number of rounds" },
 ];
 
-/** Settings page: the four breathing parameters, the sound switch and the Play button. */
+/** Settings page: the breathing parameters, the sound switch with its audio fields, and Play. */
 export const BreathSettingsForm = ({
   settings,
   bounds,
+  audio,
+  audioBounds,
   error,
   soundOn,
   onSettingsChange,
+  onAudioChange,
   onSoundToggle,
   onPlay,
 }: BreathSettingsFormProps) => (
@@ -56,6 +68,7 @@ export const BreathSettingsForm = ({
     <Button type="button" variant="outline" aria-pressed={soundOn} onClick={onSoundToggle}>
       Sound: {soundOn ? "on" : "off"}
     </Button>
+    {soundOn && <BreathAudioFields audio={audio} bounds={audioBounds} onChange={onAudioChange} />}
     {error && <Alert variant="destructive">{error}</Alert>}
     <Button type="submit" size="lg" disabled={error !== null}>
       Play
