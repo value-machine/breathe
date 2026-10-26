@@ -14,71 +14,41 @@ const HEADPHONES: BreathAudioSettings = { ...DEFAULT_AUDIO_SETTINGS, mode: "head
 const SPEAKERS: BreathAudioSettings = { ...DEFAULT_AUDIO_SETTINGS, mode: "speakers" };
 
 describe("cueForPhase", () => {
-  it("should ramp the beat up from low to high across an inhale when the phase is an inhale", () => {
+  it("should return the given beat range and the breath level when the phase is an inhale", () => {
     const phase: BreathPhase = { kind: "inhale", seconds: 4, round: 1 };
 
-    expect(cueForPhase(phase, HEADPHONES, HEADPHONES.beatLowHz)).toEqual({
+    expect(cueForPhase(phase, HEADPHONES, { startHz: 6, endHz: 7.2 })).toEqual({
       mode: "headphones",
       carrierHz: 200,
-      beatStartHz: 4,
-      beatEndHz: 8,
+      beatStartHz: 6,
+      beatEndHz: 7.2,
       seconds: 4,
       peakGain: 0.15,
     });
   });
 
-  it("should ramp the beat down from high to low across an exhale when the phase is an exhale", () => {
-    const phase: BreathPhase = { kind: "exhale", seconds: 6, round: 1 };
-
-    expect(cueForPhase(phase, HEADPHONES, HEADPHONES.beatLowHz)).toMatchObject({
-      beatStartHz: 8,
-      beatEndHz: 4,
-      seconds: 6,
-    });
-  });
-
-  it("should keep the beat at the low value at half gain when the phase is a hold", () => {
+  it("should use half the breath level when the phase is a hold", () => {
     const phase: BreathPhase = { kind: "hold", seconds: 15, round: 1 };
 
-    expect(cueForPhase(phase, HEADPHONES, HEADPHONES.beatLowHz)).toMatchObject({
-      beatStartHz: 4,
-      beatEndHz: 4,
+    expect(cueForPhase(phase, HEADPHONES, { startHz: 7.2, endHz: 6 })).toMatchObject({
       peakGain: 0.075,
     });
   });
 
-  it("should keep the beat where the last breath ended when the hold follows an inhale", () => {
-    const phase: BreathPhase = { kind: "hold", seconds: 15, round: 1 };
+  it("should carry the speakers mode and the carrier into the cue when speakers mode is selected", () => {
+    const phase: BreathPhase = { kind: "exhale", seconds: 4, round: 1 };
 
-    expect(cueForPhase(phase, HEADPHONES, HEADPHONES.beatHighHz)).toMatchObject({
-      beatStartHz: 8,
-      beatEndHz: 8,
+    expect(cueForPhase(phase, SPEAKERS, { startHz: 7, endHz: 5 })).toMatchObject({
+      mode: "speakers",
+      carrierHz: 200,
     });
-  });
-
-  it("should carry the speakers mode into the cue when speakers mode is selected", () => {
-    const phase: BreathPhase = { kind: "inhale", seconds: 4, round: 1 };
-
-    expect(cueForPhase(phase, SPEAKERS, SPEAKERS.beatLowHz).mode).toBe("speakers");
-  });
-
-  it("should use the configured carrier and beat range when the settings are changed", () => {
-    const phase: BreathPhase = { kind: "inhale", seconds: 4, round: 1 };
-
-    expect(
-      cueForPhase(
-        phase,
-        { mode: "headphones", effect: "custom", carrierHz: 300, beatLowHz: 2, beatHighHz: 6 },
-        2
-      )
-    ).toMatchObject({ carrierHz: 300, beatStartHz: 2, beatEndHz: 6 });
   });
 });
 
 const createFakeContext = () => {
   const makeOscillator = () => ({
     type: "sine",
-    frequency: { setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() },
+    frequency: { value: 0, setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() },
     connect: vi.fn(),
     start: vi.fn(),
     stop: vi.fn(),
@@ -86,6 +56,7 @@ const createFakeContext = () => {
   const oscillators: ReturnType<typeof makeOscillator>[] = [];
   const makeGain = () => ({
     gain: {
+      value: 1,
       setValueAtTime: vi.fn(),
       linearRampToValueAtTime: vi.fn(),
       exponentialRampToValueAtTime: vi.fn(),
@@ -106,32 +77,89 @@ const createFakeContext = () => {
   return { ctx, oscillators };
 };
 
-describe("scheduleBreathSession", () => {
-  const TWO_PHASES: BreathPhase[] = [
-    { kind: "inhale", seconds: 2, round: 1 },
-    { kind: "hold", seconds: 3, round: 1 },
-  ];
+// Calm: beat high 8, low 4, so the swing is 1 Hz and the session trend runs 7 → 5 Hz.
+// Two phases of 2 s inhale and 3 s hold: the trend is 7 − 0.4·t, so it is 6.2 at 2 s and 5 at 5 s.
+const INHALE_AND_HOLD: BreathPhase[] = [
+  { kind: "inhale", seconds: 2, round: 1 },
+  { kind: "hold", seconds: 3, round: 1 },
+];
 
+describe("scheduleBreathSession", () => {
   it("should carry the carrier in the left ear and the beat in the right ear when headphones mode is scheduled", () => {
     const { ctx, oscillators } = createFakeContext();
 
-    scheduleBreathSession(ctx as unknown as AudioContext, TWO_PHASES, HEADPHONES);
+    scheduleBreathSession(ctx as unknown as AudioContext, INHALE_AND_HOLD, HEADPHONES);
 
     const [left, right] = oscillators;
     expect(ctx.createChannelMerger).toHaveBeenCalledWith(2);
     expect(left.frequency.setValueAtTime).not.toHaveBeenCalled();
-    expect(right.frequency.setValueAtTime).toHaveBeenCalledWith(204, 10);
-    expect(right.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(208, 12);
+    expect(right.frequency.setValueAtTime).toHaveBeenCalledWith(expect.closeTo(206, 5), 10);
+    expect(right.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(
+      expect.closeTo(207.2, 5),
+      12
+    );
   });
 
-  it("should keep the beat steady through the hold when the hold follows an inhale", () => {
+  it("should keep the beat at the swing above the trend through the hold when the hold follows an inhale", () => {
     const { ctx, oscillators } = createFakeContext();
 
-    scheduleBreathSession(ctx as unknown as AudioContext, TWO_PHASES, HEADPHONES);
+    scheduleBreathSession(ctx as unknown as AudioContext, INHALE_AND_HOLD, HEADPHONES);
 
     const [, right] = oscillators;
-    expect(right.frequency.setValueAtTime).toHaveBeenCalledWith(208, 12);
-    expect(right.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(208, 15);
+    expect(right.frequency.setValueAtTime).toHaveBeenCalledWith(expect.closeTo(207.2, 5), 12);
+    expect(right.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(
+      expect.closeTo(206, 5),
+      15
+    );
+  });
+
+  it("should drift the beat down over the session when later breaths start lower", () => {
+    const { ctx, oscillators } = createFakeContext();
+    const fourBreaths: BreathPhase[] = [
+      { kind: "inhale", seconds: 2, round: 1 },
+      { kind: "exhale", seconds: 2, round: 1 },
+      { kind: "inhale", seconds: 2, round: 1 },
+      { kind: "exhale", seconds: 2, round: 1 },
+    ];
+
+    scheduleBreathSession(ctx as unknown as AudioContext, fourBreaths, HEADPHONES);
+
+    const right = oscillators[1];
+    const firstInhaleStart = right.frequency.setValueAtTime.mock.calls[0][0];
+    const secondInhaleStart = right.frequency.setValueAtTime.mock.calls[2][0];
+    expect(secondInhaleStart).toBeLessThan(firstInhaleStart);
+  });
+
+  it("should keep every beat value between beat low and beat high when a session is scheduled", () => {
+    const { ctx, oscillators } = createFakeContext();
+    const phases: BreathPhase[] = [
+      { kind: "inhale", seconds: 4, round: 1 },
+      { kind: "exhale", seconds: 6, round: 1 },
+      { kind: "hold", seconds: 5, round: 1 },
+      { kind: "inhale", seconds: 4, round: 1 },
+      { kind: "hold", seconds: 15, round: 1 },
+      { kind: "exhale", seconds: 6, round: 1 },
+    ];
+
+    scheduleBreathSession(ctx as unknown as AudioContext, phases, HEADPHONES);
+
+    const right = oscillators[1];
+    const values = [
+      ...right.frequency.setValueAtTime.mock.calls.map((call) => call[0]),
+      ...right.frequency.linearRampToValueAtTime.mock.calls.map((call) => call[0]),
+    ];
+    for (const hz of values) {
+      expect(hz).toBeGreaterThanOrEqual(204 - 1e-9);
+      expect(hz).toBeLessThanOrEqual(208 + 1e-9);
+    }
+  });
+
+  it("should stop every oscillator at the end of the session when a session is scheduled", () => {
+    const { ctx, oscillators } = createFakeContext();
+
+    scheduleBreathSession(ctx as unknown as AudioContext, INHALE_AND_HOLD, HEADPHONES);
+
+    for (const osc of oscillators) expect(osc.stop).toHaveBeenCalledWith(15);
   });
 
   it("should use two oscillators for the whole session when there are many phases", () => {
@@ -147,18 +175,10 @@ describe("scheduleBreathSession", () => {
     expect(oscillators).toHaveLength(2);
   });
 
-  it("should stop every oscillator at the end of the session when a session is scheduled", () => {
-    const { ctx, oscillators } = createFakeContext();
-
-    scheduleBreathSession(ctx as unknown as AudioContext, TWO_PHASES, HEADPHONES);
-
-    for (const osc of oscillators) expect(osc.stop).toHaveBeenCalledWith(15);
-  });
-
   it("should crossfade the level from the inhale peak to the hold level when a hold follows an inhale", () => {
     const { ctx } = createFakeContext();
 
-    scheduleBreathSession(ctx as unknown as AudioContext, TWO_PHASES, HEADPHONES);
+    scheduleBreathSession(ctx as unknown as AudioContext, INHALE_AND_HOLD, HEADPHONES);
 
     const level = ctx.createGain.mock.results[0].value.gain;
     expect(level.setValueAtTime).toHaveBeenCalledWith(0.15, 12);
@@ -168,12 +188,21 @@ describe("scheduleBreathSession", () => {
   it("should modulate one carrier at the beat rate when speakers mode is scheduled", () => {
     const { ctx, oscillators } = createFakeContext();
 
-    scheduleBreathSession(ctx as unknown as AudioContext, TWO_PHASES, SPEAKERS);
+    scheduleBreathSession(ctx as unknown as AudioContext, INHALE_AND_HOLD, SPEAKERS);
 
     const [, lfo] = oscillators;
     expect(ctx.createChannelMerger).not.toHaveBeenCalled();
-    expect(lfo.frequency.setValueAtTime).toHaveBeenCalledWith(4, 10);
-    expect(lfo.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(8, 12);
+    expect(lfo.frequency.setValueAtTime).toHaveBeenCalledWith(expect.closeTo(6, 5), 10);
+    expect(lfo.frequency.linearRampToValueAtTime).toHaveBeenCalledWith(expect.closeTo(7.2, 5), 12);
+  });
+
+  it("should keep the speakers tone pulsing rather than gating off when speakers mode is scheduled", () => {
+    const { ctx } = createFakeContext();
+
+    scheduleBreathSession(ctx as unknown as AudioContext, INHALE_AND_HOLD, SPEAKERS);
+
+    const modulation = ctx.createGain.mock.results[0].value.gain;
+    expect(modulation.value).toBe(0.7);
   });
 });
 
