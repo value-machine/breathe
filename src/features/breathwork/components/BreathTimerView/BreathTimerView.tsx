@@ -1,15 +1,15 @@
 import { Button } from "@/components/common/Button";
-import { cn } from "@/shared/utils/cn";
 import type { BreathPhase, BreathPhaseKind } from "../../types/breathwork.types";
-import { BreathCircle } from "../BreathCircle/BreathCircle";
 import type { BreathSessionStatus } from "../../hooks/useBreathSession";
+import { BreathCircle } from "../BreathCircle/BreathCircle";
 
 export interface BreathTimerViewProps {
   status: BreathSessionStatus;
   current: BreathPhase | null;
-  circleExpanded: boolean;
+  circleScale: number;
+  /** Share of the current round that has elapsed, from 0 to 1. */
+  roundProgress: number;
   phaseRemainingSeconds: number;
-  roundsRemaining: number;
   totalRounds: number;
   onPause: () => void;
   onResume: () => void;
@@ -22,21 +22,20 @@ const PHASE_LABEL: Record<BreathPhaseKind, string> = {
   hold: "Hold",
 };
 
-/** Timer page: the breathing circle, the current phase, rounds left and the session controls. */
+/** Timer page: the breathing circle, the current phase, round progress and the session controls. */
 export const BreathTimerView = ({
   status,
   current,
-  circleExpanded,
+  circleScale,
+  roundProgress,
   phaseRemainingSeconds,
-  roundsRemaining,
   totalRounds,
   onPause,
   onResume,
   onStop,
 }: BreathTimerViewProps) => {
   const isPaused = status === "paused";
-  const completedRounds = totalRounds - roundsRemaining;
-  const progressPercent = totalRounds === 0 ? 0 : (completedRounds / totalRounds) * 100;
+  const roundPercent = Math.round(roundProgress * 100);
 
   return (
     <section
@@ -44,7 +43,7 @@ export const BreathTimerView = ({
       className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col items-center gap-8 px-4 py-8"
     >
       <div className="flex h-72 items-center justify-center">
-        <BreathCircle expanded={circleExpanded} />
+        <BreathCircle scale={circleScale} />
       </div>
       <p aria-live="polite" className="font-heading text-2xl text-foreground">
         {isPaused ? "Paused" : current ? PHASE_LABEL[current.kind] : "Done"}
@@ -53,19 +52,19 @@ export const BreathTimerView = ({
       <div className="w-full">
         <div
           role="progressbar"
-          aria-label="Rounds completed"
+          aria-label="Progress in this round"
           aria-valuemin={0}
-          aria-valuemax={totalRounds}
-          aria-valuenow={completedRounds}
+          aria-valuemax={100}
+          aria-valuenow={roundPercent}
           className="h-2 w-full overflow-hidden rounded-full bg-muted"
         >
           <div
-            className={cn("h-full bg-primary transition-[width] ease-standard")}
-            style={{ width: `${progressPercent}%` }}
+            className="h-full bg-primary transition-[width] duration-100 ease-linear"
+            style={{ width: `${roundPercent}%` }}
           />
         </div>
         <p className="mt-2 text-sm text-muted-foreground">
-          Round {Math.min(completedRounds + 1, totalRounds)} of {totalRounds}
+          {current ? `Round ${current.round} of ${totalRounds}` : `${totalRounds} rounds`}
         </p>
       </div>
       <div className="flex w-full gap-3">

@@ -8,6 +8,7 @@ A guided breathing session: the user sets the breathing pattern (breaths before 
 
 - `services/breathSessionService.ts`: pure session engine. Settings validation and bounds, hold progression (D4), the phase list, and progress/advance helpers. No React.
 - `hooks/useBreathSession.ts`: runs a phase list with pause, resume and stop. Time comes from `performance.now()`.
+- Circle and bar are driven by the session clock, not by CSS phase transitions. The circle scale moves across the whole inhale (0.5 → 1) and exhale (1 → 0.5), and a hold keeps the size of the last breath. The round bar shows the share of the current round that has elapsed. Pause freezes both with the countdown.
 - `components/`: `BreathCircle` (breathing guide), `BreathSettingsForm` (settings page), `BreathTimerView` (timer page), `BreathSessionScreen` (connects the hook to the timer view).
 - `types/breathwork.types.ts`: `BreathSettings`, `BreathPhase`, and the validation result type.
 - Page: `src/pages/breathe/BreathePage.tsx`, mounted at `/breathe`.

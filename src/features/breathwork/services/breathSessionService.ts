@@ -123,3 +123,39 @@ export const isCircleExpanded = (phases: BreathPhase[], phaseIndex: number): boo
   }
   return false;
 };
+
+/** Circle size range as scale factors: contracted (after an exhale) to expanded (after an inhale). */
+export const CIRCLE_MIN_SCALE = 0.5;
+export const CIRCLE_MAX_SCALE = 1;
+
+/**
+ * Circle scale at the current point of a session. Inhale grows across the whole inhale,
+ * exhale shrinks across the whole exhale, and a hold keeps the size of the last breath.
+ */
+export const circleScaleAt = (phases: BreathPhase[], progress: BreathSessionProgress): number => {
+  const phase = phases[progress.phaseIndex];
+  if (!phase) return CIRCLE_MIN_SCALE;
+  if (phase.kind === "hold") {
+    return isCircleExpanded(phases, progress.phaseIndex) ? CIRCLE_MAX_SCALE : CIRCLE_MIN_SCALE;
+  }
+  const elapsedShare = 1 - progress.remainingMs / (phase.seconds * 1000);
+  const span = CIRCLE_MAX_SCALE - CIRCLE_MIN_SCALE;
+  return phase.kind === "inhale"
+    ? CIRCLE_MIN_SCALE + span * elapsedShare
+    : CIRCLE_MAX_SCALE - span * elapsedShare;
+};
+
+/** Share of the current round that has elapsed, from 0 at its start to 1 at its end. */
+export const roundProgressAt = (phases: BreathPhase[], progress: BreathSessionProgress): number => {
+  const current = phases[progress.phaseIndex];
+  if (!current) return 0;
+  let roundMs = 0;
+  let elapsedBeforeCurrentMs = 0;
+  phases.forEach((phase, index) => {
+    if (phase.round !== current.round) return;
+    roundMs += phase.seconds * 1000;
+    if (index < progress.phaseIndex) elapsedBeforeCurrentMs += phase.seconds * 1000;
+  });
+  const elapsedInCurrentMs = current.seconds * 1000 - progress.remainingMs;
+  return (elapsedBeforeCurrentMs + elapsedInCurrentMs) / roundMs;
+};

@@ -1,5 +1,10 @@
 [
   {
+    "title": "Build breathwork timer app (settings, breathing timer, sound cues)",
+    "description": "Build the breathwork timer per documentation/DOC_APP_VISION.md (§ Core session flow, § Design direction): a settings page (breaths before hold, inhale/exhale time, hold target, rounds, sound on/off), a breathing timer page with an expanding/contracting circle, round progress, play/pause/stop, sound cues per phase, and the hold progression (1/3, 2/3, full target; fixed 15 s hold). Stack and architecture follow this repo. Starts with loop-refine. Result: merged in PR #2 (lap temp_job_breathwork-timer; route /breathe; live on the Cloudflare preview; owner Pass at Stop 2).",
+    "status": "done"
+  },
+  {
     "title": "Capture app errors to the database",
     "description": "Global window error and unhandledrejection handler, error boundary reporting, and the existing logError path, all writing through the deduplicating upsert from the signals backend task. Tag each error with the environment (local, staging, production). Depends on: Signals backend task. Result: merged in PR #28 (src/features/error-reporting; live on production).",
     "status": "done"
