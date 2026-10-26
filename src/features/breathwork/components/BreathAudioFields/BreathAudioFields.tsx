@@ -1,13 +1,14 @@
 import { Button } from "@/components/common/Button";
 import { FormField } from "@/components/common/FormField";
-import {
-  AUDIO_SETTINGS_BOUNDS,
-  type BreathAudioMode,
-  type BreathAudioSettings,
-} from "../../services/breathCueService";
+import type {
+  BreathAudioMode,
+  BreathAudioSettings,
+  BreathAudioSettingsBounds,
+} from "../../types/breathwork.types";
 
 export interface BreathAudioFieldsProps {
   audio: BreathAudioSettings;
+  bounds: BreathAudioSettingsBounds;
   onChange: (next: BreathAudioSettings) => void;
 }
 
@@ -22,7 +23,7 @@ const HELP: Record<BreathAudioMode, string> = {
 };
 
 /** Sound settings: output mode, carrier frequency and the beat range across the breath. */
-export const BreathAudioFields = ({ audio, onChange }: BreathAudioFieldsProps) => (
+export const BreathAudioFields = ({ audio, bounds, onChange }: BreathAudioFieldsProps) => (
   <div className="flex flex-col gap-4">
     <div role="group" aria-label="Sound mode" className="flex gap-3">
       {MODES.map(({ mode, label }) => (
@@ -44,8 +45,8 @@ export const BreathAudioFields = ({ audio, onChange }: BreathAudioFieldsProps) =
       type="number"
       inputMode="numeric"
       step={1}
-      min={AUDIO_SETTINGS_BOUNDS.carrierHz.min}
-      max={AUDIO_SETTINGS_BOUNDS.carrierHz.max}
+      min={bounds.carrierHz.min}
+      max={bounds.carrierHz.max}
       value={audio.carrierHz}
       onChange={(event) => onChange({ ...audio, carrierHz: Number(event.target.value) })}
     />
@@ -54,8 +55,8 @@ export const BreathAudioFields = ({ audio, onChange }: BreathAudioFieldsProps) =
       type="number"
       inputMode="numeric"
       step={1}
-      min={AUDIO_SETTINGS_BOUNDS.beatLowHz.min}
-      max={AUDIO_SETTINGS_BOUNDS.beatLowHz.max}
+      min={bounds.beatLowHz.min}
+      max={bounds.beatLowHz.max}
       value={audio.beatLowHz}
       onChange={(event) => onChange({ ...audio, beatLowHz: Number(event.target.value) })}
     />
@@ -64,8 +65,8 @@ export const BreathAudioFields = ({ audio, onChange }: BreathAudioFieldsProps) =
       type="number"
       inputMode="numeric"
       step={1}
-      min={AUDIO_SETTINGS_BOUNDS.beatHighHz.min}
-      max={AUDIO_SETTINGS_BOUNDS.beatHighHz.max}
+      min={bounds.beatHighHz.min}
+      max={bounds.beatHighHz.max}
       value={audio.beatHighHz}
       onChange={(event) => onChange({ ...audio, beatHighHz: Number(event.target.value) })}
     />

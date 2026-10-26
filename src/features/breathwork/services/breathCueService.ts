@@ -1,17 +1,11 @@
-import type { BreathPhase } from "../types/breathwork.types";
+import type {
+  BreathAudioMode,
+  BreathAudioSettings,
+  BreathAudioSettingsBounds,
+  BreathPhase,
+} from "../types/breathwork.types";
 
-export type BreathAudioMode = "headphones" | "speakers";
-
-/** Audio settings the user can change. Ranges are enforced by the settings form. */
-export interface BreathAudioSettings {
-  mode: BreathAudioMode;
-  /** Tone heard in the left ear (headphones) or carried by the speaker (speakers), in Hz. */
-  carrierHz: number;
-  /** Beat frequency at the start of an inhale and the end of an exhale, in Hz. */
-  beatLowHz: number;
-  /** Beat frequency at the end of an inhale and the start of an exhale, in Hz. */
-  beatHighHz: number;
-}
+export type { BreathAudioMode, BreathAudioSettings };
 
 export const DEFAULT_AUDIO_SETTINGS: BreathAudioSettings = {
   mode: "headphones",
@@ -20,7 +14,7 @@ export const DEFAULT_AUDIO_SETTINGS: BreathAudioSettings = {
   beatHighHz: 10,
 };
 
-export const AUDIO_SETTINGS_BOUNDS = {
+export const AUDIO_SETTINGS_BOUNDS: BreathAudioSettingsBounds = {
   carrierHz: { min: 100, max: 400 },
   beatLowHz: { min: 1, max: 40 },
   beatHighHz: { min: 1, max: 40 },

@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import type { BreathAudioController } from "../../hooks/useBreathAudio";
 import { useBreathSession } from "../../hooks/useBreathSession";
-import type { BreathAudioSettings } from "../../services/breathCueService";
-import type { BreathPhase } from "../../types/breathwork.types";
+import type { BreathAudioSettings, BreathPhase } from "../../types/breathwork.types";
 import { BreathTimerView } from "../BreathTimerView/BreathTimerView";
 
 export interface BreathSessionScreenProps {

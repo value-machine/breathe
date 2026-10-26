@@ -9,11 +9,15 @@ import {
   validateBreathSettings,
 } from "@/features/breathwork/services/breathSessionService";
 import {
+  AUDIO_SETTINGS_BOUNDS,
   DEFAULT_AUDIO_SETTINGS,
   validateAudioSettings,
-  type BreathAudioSettings,
 } from "@/features/breathwork/services/breathCueService";
-import type { BreathPhase, BreathSettings } from "@/features/breathwork/types/breathwork.types";
+import type {
+  BreathAudioSettings,
+  BreathPhase,
+  BreathSettings,
+} from "@/features/breathwork/types/breathwork.types";
 
 /** Breathwork timer: settings first, then a session, then back to settings. */
 export const BreathePage = () => {
@@ -53,6 +57,7 @@ export const BreathePage = () => {
       settings={settings}
       bounds={BREATH_SETTINGS_BOUNDS}
       audio={audio}
+      audioBounds={AUDIO_SETTINGS_BOUNDS}
       error={error}
       soundOn={soundOn}
       onSettingsChange={setSettings}

@@ -12,7 +12,7 @@ A guided breathing session: the user sets the breathing pattern (breaths before 
 - `hooks/useBreathAudio.ts`: owns one AudioContext per session. Created inside the Play click, suspended on pause, resumed on resume, closed on exit. Does nothing when sound is off.
 - Circle and bar are driven by the session clock, not by CSS phase transitions. The circle scale moves across the whole inhale (0.5 → 1) and exhale (1 → 0.5), and a hold keeps the size of the last breath. The round bar shows the share of the current round that has elapsed. Pause freezes both with the countdown.
 - `components/`: `BreathCircle`, `BreathSettingsForm` (settings page), `BreathAudioFields` (sound mode and beat range), `BreathTimerView` (timer page), `BreathSessionScreen` (connects the hooks to the timer view).
-- `types/breathwork.types.ts`: `BreathSettings`, `BreathPhase`, and the validation result type.
+- `types/breathwork.types.ts`: `BreathSettings`, `BreathPhase`, the audio types (`BreathAudioSettings`, `BreathAudioMode`) and the validation result type. Components import types from here; bounds come from the page as props.
 - Page: `src/pages/breathe/BreathePage.tsx`, mounted at `/breathe`. It owns the audio controller and the audio settings.
 
 Settings and audio settings are component state only (no storage).
