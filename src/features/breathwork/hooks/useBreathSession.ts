@@ -3,6 +3,7 @@ import {
   advanceBreathProgress,
   CIRCLE_MIN_SCALE,
   circleScaleAt,
+  limitEchoCount,
   roundProgressAt,
   startBreathProgress,
   type BreathSessionProgress,
@@ -23,6 +24,8 @@ export interface UseBreathSessionResult {
   status: BreathSessionStatus;
   /** Phase being played, or null when the session is idle or finished. */
   current: BreathPhase | null;
+  /** Breath limits passed so far (see limitEchoCount); each new one plays the echo ring. */
+  echoCount: number;
   /** Circle scale at this moment, from CIRCLE_MIN_SCALE to CIRCLE_MAX_SCALE. */
   circleScale: number;
   /** Share of the current round that has elapsed, from 0 to 1. */
@@ -88,6 +91,7 @@ export const useBreathSession = (phases: BreathPhase[]): UseBreathSessionResult 
   return {
     status: session.status,
     current: isLive ? (phases[session.progress.phaseIndex] ?? null) : null,
+    echoCount: limitEchoCount(phases, session.progress.phaseIndex),
     circleScale: isLive ? circleScaleAt(phases, session.progress) : CIRCLE_MIN_SCALE,
     roundProgress: isLive ? roundProgressAt(phases, session.progress) : 0,
     phaseRemainingSeconds: Math.ceil(session.progress.remainingMs / 1000),

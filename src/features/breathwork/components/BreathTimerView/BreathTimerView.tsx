@@ -7,6 +7,8 @@ export interface BreathTimerViewProps {
   status: BreathSessionStatus;
   current: BreathPhase | null;
   circleScale: number;
+  /** Breath limits passed so far; each new one plays the echo ring. */
+  echoCount: number;
   /** Share of the current round that has elapsed, from 0 to 1. */
   roundProgress: number;
   phaseRemainingSeconds: number;
@@ -27,6 +29,7 @@ export const BreathTimerView = ({
   status,
   current,
   circleScale,
+  echoCount,
   roundProgress,
   phaseRemainingSeconds,
   totalRounds,
@@ -43,7 +46,7 @@ export const BreathTimerView = ({
       className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col items-center gap-8 px-4 py-8"
     >
       <div className="flex h-72 items-center justify-center">
-        <BreathCircle scale={circleScale} />
+        <BreathCircle scale={circleScale} echoCount={echoCount} />
       </div>
       <p aria-live="polite" className="font-heading text-2xl text-foreground">
         {isPaused ? "Paused" : current ? PHASE_LABEL[current.kind] : "Done"}

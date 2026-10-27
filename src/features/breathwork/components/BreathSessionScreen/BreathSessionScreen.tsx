@@ -49,6 +49,7 @@ export const BreathSessionScreen = ({
       status={status}
       current={session.current}
       circleScale={session.circleScale}
+      echoCount={session.echoCount}
       roundProgress={session.roundProgress}
       phaseRemainingSeconds={session.phaseRemainingSeconds}
       totalRounds={phases[phases.length - 1]?.round ?? 0}

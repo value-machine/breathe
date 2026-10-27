@@ -7,6 +7,7 @@ const baseProps: BreathTimerViewProps = {
   status: "running",
   current: { kind: "inhale", seconds: 4, round: 1 },
   circleScale: 0.75,
+  echoCount: 0,
   roundProgress: 0.25,
   phaseRemainingSeconds: 3,
   totalRounds: 3,
@@ -21,6 +22,14 @@ describe("BreathTimerView", () => {
 
     expect(screen.getByText("Breathe in")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
+  });
+
+  it("should render a decorative echo ring that ignores pointer events when the timer is shown", () => {
+    const { container } = render(<BreathTimerView {...baseProps} />);
+
+    const ring = container.querySelector("[data-echo-ring]");
+    expect(ring).toHaveAttribute("aria-hidden", "true");
+    expect(ring).toHaveClass("pointer-events-none");
   });
 
   it("should show progress within the current round when a round is running", () => {

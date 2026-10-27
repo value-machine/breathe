@@ -57,6 +57,7 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-gradient-start: var(--primary-gradient-start);
+  --color-echo-gold: var(--echo-gold);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
