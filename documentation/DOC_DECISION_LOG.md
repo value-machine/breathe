@@ -6,6 +6,18 @@ History of the decisions jobs made: what was chosen, what was rejected, and why.
 - **Cite with the job key:** `(skill-loop D53)`. Ids restart at D1 in every job, so a bare `D53` is ambiguous.
 - **Who writes it:** `loop-ship` appends the lap's closed rows from its scratch `DECISIONS.md` in the ship commit ([`loop-ship`](../.agents/skills/loop-ship/SKILL.md)). Earlier job logs were deleted in #16; only the ones still cited are restored below from `a920c0d^`.
 
+## chime-phase-cues — claude/upbeat-fermat-zio2pb
+
+A soft chime marks each breath phase start and each round end, layered over the sound bed and gated by the sound switch.
+
+| id | topic | status | choice | source | notes |
+|----|-------|--------|--------|--------|-------|
+| D1 | Which events get a chime | closed | Each phase start (inhale, exhale, hold) and each round end | loop-refine | clear-winner: vision Goal 2 says every phase change is signalled by sound |
+| D2 | Chime vs the continuous bed | closed | Chimes layered over the existing binaural / isochronic bed; bed unchanged | loop-refine | clear-winner: replacing the bed would drop the binaural design the owner asked for |
+| D3 | Chimes with sound off | closed | No chimes; the sound switch governs all audio | loop-refine | clear-winner: the switch already gates all sound (vision) |
+| D4 | Chime sound and pitch | closed | Soft sine bell; inhale higher, exhale lower, hold a neutral third; round end a distinct chime, also at the last round's end | agent-pick | timbre and pitch are swappable details inside "soft tone" |
+| D5 | Round boundary: phase chime or round-end chime | closed | At a round boundary only the round-end chime plays | loop-plan | agent-pick: two chimes on the same instant would blur into one |
+
 ## harness-overview-page — ccr-9236a832-dfo9sc
 
 A designed, plain-language overview of the agent harness is published as an app route and shown to visitors through a welcome card on the home page, with its preview image at the top of the README.
