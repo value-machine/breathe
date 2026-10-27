@@ -5,6 +5,7 @@ import type {
   BreathEffectId,
   BreathEffectPreset,
   BreathPhase,
+  BreathPhaseKind,
 } from "../types/breathwork.types";
 
 export type { BreathAudioMode, BreathAudioSettings, BreathEffectId, BreathEffectPreset };
@@ -174,6 +175,35 @@ const createVoice = (ctx: AudioContext, audio: BreathAudioSettings): Voice =>
     ? createBinauralVoice(ctx, audio.carrierHz)
     : createIsochronicVoice(ctx, audio.carrierHz);
 
+/** Chime kinds: one per phase kind, plus the round end. */
+export type ChimeKind = BreathPhaseKind | "roundEnd";
+
+/** One chime: its offset in seconds from the start of the session, and what it marks. */
+export interface ChimeEvent {
+  at: number;
+  kind: ChimeKind;
+}
+
+/**
+ * When each chime plays. A phase start gets its chime, except a phase that starts a new round:
+ * there the round-end chime plays instead (D5). Every round ends with a round-end chime,
+ * including the last one.
+ */
+export const chimeSchedule = (phases: BreathPhase[]): ChimeEvent[] => {
+  const events: ChimeEvent[] = [];
+  let at = 0;
+  phases.forEach((phase, index) => {
+    const previous = phases[index - 1];
+    const next = phases[index + 1];
+    const startsRound = previous !== undefined && previous.round !== phase.round;
+    if (!startsRound) events.push({ at, kind: phase.kind });
+    at += phase.seconds;
+    const endsRound = next === undefined || next.round !== phase.round;
+    if (endsRound) events.push({ at, kind: "roundEnd" });
+  });
+  return events;
+};
+
 /** Cue for each phase, in order, from the session beat plan. */
 const cuesForSession = (phases: BreathPhase[], audio: BreathAudioSettings): BreathCueSpec[] =>
   beatRangesForSession(phases, audio).map((range, index) =>
@@ -211,6 +241,37 @@ interface CueWindow {
   end: number;
 }
 
+const CHIME_PEAK_GAIN = 0.12;
+const CHIME_ATTACK_SECONDS = 0.02;
+const CHIME_DECAY_SECONDS = 1.2;
+/** Pitch per chime kind, in Hz: inhale high, exhale low, hold a neutral third, round end distinct. */
+const CHIME_HZ: Record<ChimeKind, number> = {
+  inhale: 659.25,
+  exhale: 440,
+  hold: 523.25,
+  roundEnd: 783.99,
+};
+
+/** One soft sine chime at its time, on its own gain so it sits over the bed. */
+const scheduleChime = (ctx: AudioContext, event: ChimeEvent, startAt: number): void => {
+  const at = startAt + event.at;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.frequency.value = CHIME_HZ[event.kind];
+  gain.gain.setValueAtTime(SILENCE_GAIN, at);
+  gain.gain.linearRampToValueAtTime(CHIME_PEAK_GAIN, at + CHIME_ATTACK_SECONDS);
+  gain.gain.exponentialRampToValueAtTime(SILENCE_GAIN, at + CHIME_DECAY_SECONDS);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(at);
+  osc.stop(at + CHIME_DECAY_SECONDS);
+};
+
+/** Schedules one chime per chime event of the session, on the same clock as the bed. */
+const scheduleBreathChimes = (ctx: AudioContext, phases: BreathPhase[], startAt: number): void => {
+  for (const event of chimeSchedule(phases)) scheduleChime(ctx, event, startAt);
+};
+
 /**
  * Schedules a whole session as one continuous voice from now. Beat and level are automated per
  * phase on the AudioContext clock, so phase changes are crossfades, not gaps. Suspending the
@@ -237,6 +298,7 @@ export const scheduleBreathSession = (
     source.start(window.start);
     source.stop(window.end);
   }
+  scheduleBreathChimes(ctx, phases, window.start);
 };
 
 /** Returns a message for the first invalid audio setting, or null when all are valid. */

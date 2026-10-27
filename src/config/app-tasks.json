@@ -1,5 +1,10 @@
 [
   {
+    "title": "Chime cues at breath phase changes (chime theme: deep improvement)",
+    "description": "Owner asked for a deep improvement that aligns to the chime theme. Current gap: the breath sound is one continuous tone (binaural or isochronic) and gives no discrete signal when a phase changes, so the user has to watch the screen to know when to inhale, exhale or hold. Candidate direction: a soft chime at each inhale start, a lower chime at each exhale start, and a distinct chime at round end, layered over the continuous bed, with the chime sound and volume set in the sound fields. Owner picks the scope and sound at refine. Sound must not claim health effects (documentation/DOC_APP_VISION.md). Lap: to be created by loop-refine.",
+    "status": "in-progress"
+  },
+  {
     "title": "Fix Google sign-in returning to the wrong site with a PKCE error",
     "description": "Seen on the production site after signing in with Google from a preview: 'PKCE code verifier not found in storage'. Supabase auth logs show the sign-in started on the preview origin, Supabase redirected to the Site URL (production) because the app's bare-origin redirect address did not match the '/**' allow-list pattern, and production then failed with bad_code_verifier. The app also exchanges the code twice (supabase-js does it during client init, then the callback hook again), which would show a false error even when sign-in works. Lap: documentation/jobs/temp_job_google-signin-return/BRIEF.md.",
     "status": "in-progress"

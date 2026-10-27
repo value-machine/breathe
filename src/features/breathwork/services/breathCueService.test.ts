@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { BreathPhase } from "../types/breathwork.types";
 import {
   audioSettingsForEffect,
+  chimeSchedule,
   cueForPhase,
   DEFAULT_AUDIO_SETTINGS,
   EFFECT_PRESETS,
@@ -159,10 +160,10 @@ describe("scheduleBreathSession", () => {
 
     scheduleBreathSession(ctx as unknown as AudioContext, INHALE_AND_HOLD, HEADPHONES);
 
-    for (const osc of oscillators) expect(osc.stop).toHaveBeenCalledWith(15);
+    for (const osc of oscillators.slice(0, 2)) expect(osc.stop).toHaveBeenCalledWith(15);
   });
 
-  it("should use two oscillators for the whole session when there are many phases", () => {
+  it("should use two bed oscillators for the whole session and one per chime when there are many phases", () => {
     const { ctx, oscillators } = createFakeContext();
     const manyPhases: BreathPhase[] = Array.from({ length: 12 }, (_, i) => ({
       kind: i % 2 === 0 ? "inhale" : "exhale",
@@ -172,7 +173,7 @@ describe("scheduleBreathSession", () => {
 
     scheduleBreathSession(ctx as unknown as AudioContext, manyPhases, HEADPHONES);
 
-    expect(oscillators).toHaveLength(2);
+    expect(oscillators).toHaveLength(2 + chimeSchedule(manyPhases).length);
   });
 
   it("should crossfade the level from the inhale peak to the hold level when a hold follows an inhale", () => {
@@ -203,6 +204,50 @@ describe("scheduleBreathSession", () => {
 
     const modulation = ctx.createGain.mock.results[0].value.gain;
     expect(modulation.value).toBe(0.7);
+  });
+});
+
+describe("scheduleBreathSession chimes", () => {
+  it("should start one chime oscillator at each chime time when a session is scheduled", () => {
+    const { ctx, oscillators } = createFakeContext();
+
+    scheduleBreathSession(ctx as unknown as AudioContext, INHALE_AND_HOLD, HEADPHONES);
+
+    // Session starts at 10 s on the context clock. Chimes: inhale at 0 s, hold at 2 s, round end at 5 s.
+    const chimeStarts = oscillators.slice(2).map((osc) => osc.start.mock.calls[0][0]);
+    expect(chimeStarts).toEqual([10, 12, 15]);
+  });
+});
+
+describe("chimeSchedule", () => {
+  it("should place a chime at each phase start and at each round end when a session has two rounds", () => {
+    const twoRounds: BreathPhase[] = [
+      { kind: "inhale", seconds: 2, round: 1 },
+      { kind: "hold", seconds: 3, round: 1 },
+      { kind: "exhale", seconds: 2, round: 1 },
+      { kind: "inhale", seconds: 2, round: 2 },
+    ];
+
+    expect(chimeSchedule(twoRounds)).toEqual([
+      { at: 0, kind: "inhale" },
+      { at: 2, kind: "hold" },
+      { at: 5, kind: "exhale" },
+      { at: 7, kind: "roundEnd" },
+      { at: 9, kind: "roundEnd" },
+    ]);
+  });
+
+  it("should play only the round-end chime at a round boundary when the next phase starts a round", () => {
+    const boundary: BreathPhase[] = [
+      { kind: "exhale", seconds: 2, round: 1 },
+      { kind: "inhale", seconds: 2, round: 2 },
+    ];
+
+    expect(chimeSchedule(boundary)).toEqual([
+      { at: 0, kind: "exhale" },
+      { at: 2, kind: "roundEnd" },
+      { at: 4, kind: "roundEnd" },
+    ]);
   });
 });
 
