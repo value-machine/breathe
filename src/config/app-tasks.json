@@ -1,8 +1,8 @@
 [
   {
-    "title": "Chime cues at breath phase changes (chime theme: deep improvement)",
-    "description": "Owner asked for a deep improvement that aligns to the chime theme. Current gap: the breath sound is one continuous tone (binaural or isochronic) and gives no discrete signal when a phase changes, so the user has to watch the screen to know when to inhale, exhale or hold. Candidate direction: a soft chime at each inhale start, a lower chime at each exhale start, and a distinct chime at round end, layered over the continuous bed, with the chime sound and volume set in the sound fields. Owner picks the scope and sound at refine. Sound must not claim health effects (documentation/DOC_APP_VISION.md). Lap: to be created by loop-refine.",
-    "status": "in-progress"
+    "title": "Golden echo ring at the circle's limits (visual)",
+    "description": "Owner request: a visual echo when the breathing circle reaches a limit. At the end of a full inhale (max size) and at the end of a full exhale (min size), a golden ring starts at the circle's edge, grows outward and fades as it grows, like an echo or afterimage. Decorative only: it must not change the timing or the circle itself, and users with reduced motion get no moving ring (a static or no effect). Colour from the theme tokens, not hard-coded. Lap: to be created by loop-refine (scope and reduced-motion choice at refine).",
+    "status": "to-do"
   },
   {
     "title": "Fix Google sign-in returning to the wrong site with a PKCE error",
