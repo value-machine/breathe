@@ -31,9 +31,11 @@ Everything else: decide, record the choice where it applies, and continue.
 ### How to ask
 
 - First inspect the relevant codebase patterns, rules, and existing UX so the options are grounded in what the app already does.
+- **Use the question tool** for every owner decision (`AskUserQuestion` in Claude Code, `AskQuestion` in Cursor): the owner answers with one tap, also on a phone. Plain-text questions only where the tool isn't available. Grounding stays in the chat message; the tool's fields take plain text, no markdown (format: `.agents/skills/loop-refine/references/asking.md`) (merge-is-pass D5).
 - One question at a time, multiple choice, at most 4 options (the question tool's limit).
 - Put the recommended option first and label it — usually the one most consistent with the current codebase. Order the rest from lightest to strongest when they are implementation approaches.
 - Optional: offer a UX-impact research option when the user-facing consequences are unclear. If the owner picks it, research, explain, then ask the same question again.
+- **The owner decides in chat or by merging the PR, nothing else.** Never make a decision depend on them reading a PR body, a doc or a diff: put what they need into the chat message, as short as it can be. More text means less of it gets read (merge-is-pass D4).
 
 ### Handing an action to the owner
 
@@ -81,17 +83,16 @@ When `.claude/rules/code-style.md` § Naming requires a rename or extraction, up
 
 1. **When a violation or issue requires modifying a protected file:**
    - STOP immediately
-   - Inform user: "This requires modifying [file]. Options: [list options]"
-   - Present options clearly (e.g., "Add X to .gitignore?" or "Update config to allow this file?")
+   - Ask with the question tool (§ How to ask): "This requires modifying [file]", with the options (e.g., "Add X to .gitignore?" or "Update config to allow this file?")
    - WAIT for explicit user response
    - Only proceed after user explicitly approves the specific change
    - After receiving explicit user approval, proceed to make the change yourself
 
-2. **Consent at Stop 2:** a rule or skill change that a lap carries (for example lessons from `meta-learn-lessons`) and that the `loop-verdict` handoff card **lists** is approved by the owner's **Pass**. An unlisted protected-file change is never covered (skill-loop D50).
+2. **Consent is asked in chat:** a rule or skill change a lap wants to carry (for example lessons from `meta-learn-lessons`) is asked as one yes/no in chat, with a one-line why, before it is committed. A Pass or a merge never approves a protected-file change; a declined change becomes a backlog task (merge-is-pass D3).
 
 3. **Never assume consent:**
    - Even if the fix seems obvious, always ask
-   - Even inside the autonomous loop stages, ask before modifying protected files (outside the Stop 2 rule above)
+   - Even inside the autonomous loop stages, ask before modifying protected files
    - "NEVER adjust rules without explicit user request" applies to ALL protected files
 
 4. **Examples of required behavior:**
@@ -113,4 +114,4 @@ When `.claude/rules/code-style.md` § Naming requires a rename or extraction, up
 **Rules that reference this rule:**
 
 - `.claude/rules/architecture.md` — layer-consistency stop and performance-cost asks
-- `loop-build/SKILL.md`, `loop-ship/SKILL.md`, `loop-verdict/SKILL.md` — protected-file gates and Stop 2 consent
+- `loop-build/SKILL.md`, `loop-ship/SKILL.md`, `loop-verdict/SKILL.md` — protected-file gates and chat consent

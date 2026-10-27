@@ -24,8 +24,10 @@ STOP 2 ────────────────────────�
 
 | Evidence | Stage |
 |---|---|
-| The owner's message names something to do now | `loop-backlog` step 1 (top of the backlog, skill-loop D26) |
+| The owner's message names something to do now | `loop-backlog` step 1 (top of the backlog, skill-loop D26; on a fork without hosting, its gates run first) |
+| A fork whose onboarding is still open ([`onboarding.md`](../../loop-backlog/references/onboarding.md) § Still open on a fork), including a bare "initialize", "set up" or "next" | `loop-backlog` → onboarding from the first gate that hasn't passed (onboarding-first-lap D1) |
 | A lap has an Open row in `DECISIONS.md` (parked question) | Ask that question ([`loop-refine/references/asking.md`](../../loop-refine/references/asking.md)), then resume the lap's stage |
+| A lap's PR was merged with no verdict in chat (the owner merged it, or auto-merge did) | Pass: `loop-verdict` step 3.1, then `loop-backlog` (merge-is-pass D2) |
 | A lap's PR is open, CI green, preview present, no verdict yet | `loop-verdict` |
 | A lap's PR is open with CI red or pending | `loop-ship` step 6 |
 | Lap branch: every plan phase is `Done`, but there is no PR and no check summary | `loop-check` |

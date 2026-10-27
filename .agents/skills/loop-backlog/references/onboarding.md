@@ -1,6 +1,6 @@
 # Onboarding (first laps on a fresh fork or the template)
 
-Read by [`loop-backlog`](../SKILL.md) when the top task is one of the four seeded onboarding tasks (Supabase, Hosting, App vision, Theme), or when the owner asks for first-time setup ("set up my app", "get me started", "onboard me"). Ported from `start` (v0.42.0). The gates below run **in order** before the first product lap: each gate states what must be true, why, how the agent verifies it, and who acts. A prerequisite the agent can check is checked; an action only the owner can take (an account, a vendor settings page) is named as a requirement and the agent waits for confirmation, then verifies the result.
+Read by [`loop-backlog`](../SKILL.md) when the top task is one of the four seeded onboarding tasks (Supabase, Hosting, App vision, Theme), when § Still open on a fork applies, or when the owner asks for first-time setup ("initialize the repo", "set up my app", "get me started", "onboard me"). Ported from `start` (v0.42.0). The gates below run **in order** before the first product lap: each gate states what must be true, why, how the agent verifies it, and who acts. A prerequisite the agent can check is checked; an action only the owner can take (an account, a vendor settings page) is named as a requirement and the agent waits for confirmation, then verifies the result.
 
 ## Core behavior
 
@@ -23,6 +23,14 @@ Read by [`loop-backlog`](../SKILL.md) when the top task is one of the four seede
 **Working on a fork** (someone cloned this to build their own app): full backlog applies — tools connected, Supabase, hosting, vision **`ACTIVE`**, etc.
 
 When the user says they are on the **template** (or context is clearly harness maintenance), default to the skip list above. Only walk Supabase/Cloudflare gates when they are onboarding a fork or explicitly ask to wire up services.
+
+### Still open on a fork
+
+The check reads the repo's state, so it works the same in every fork and passes on the template (which has previews). [`router`](../../router/references/loop-map.md) and `loop-backlog` step 1 run it; the agent doesn't wait for a setup phrase.
+
+- **Hosting is open** when the seeded Hosting task is still active **and** no pull request in the repo carries the Cloudflare preview comment (`cloudflare-workers-and-pages[bot]`, "Preview URL") **and**, when a Cloudflare connector is connected, it lists no Worker named as `name` in `wrangler.jsonc`.
+- **Unknown** when neither GitHub nor Cloudflare can be read (for example an offline sandbox): say so in one line and continue; don't block on it.
+- **When hosting is open**, onboarding resumes at the first gate that hasn't passed (gates that already pass are verified and archived on the way). Hosting is the Stop 2 surface: without it no lap can reach the owner's test, so it runs before the first product lap.
 
 ## Dev task backlog (onboarding SSOT)
 
@@ -118,7 +126,7 @@ The agent sets up most of this repo itself, through connections to the services 
 
 **Template repo (harness maintenance):** **`model-c`**.
 
-**Fork:** ask once, in plain words, with the recommended option first:
+**Fork:** ask once with the question tool (`.claude/rules/agent-behavior.md` § How to ask), in plain words, with the recommended option first:
 
 > How should finished changes reach your live app?
 > - **Through a pull request, one per change (recommended)** — each change gets its own preview link to try; merging it puts it live. (Model C)
@@ -127,7 +135,7 @@ The agent sets up most of this repo itself, through connections to the services 
 
 Write `src/config/git-workflow.json` accordingly (`"mode": "model-c"` | `"model-a"` | `"model-b"`). Then walk `.claude/rules/git-workflow.md` § Mode behavior table → **fork setup**, **`main` ruleset**, **`develop` ruleset** for the chosen column. Behavior SSOT is that table — do not restate it here.
 
-**Model C:** no `develop`. Configure the `main` ruleset (table row), repo settings (squash-only with PR title as commit message, auto-delete head branches, **allow auto-merge**), and Cloudflare production branch `main` with previews on all branches (hosting task). The baseline release needs no setup: the `bootstrap` job in `.github/workflows/release-please.yml` creates it on the first push to `main`. **Ruleset confirmation gate (C — required):** confirm the live `main` ruleset via `gh api repos/OWNER/REPO/rules/branches/main` (`pull_request` + required `test` and `pr-title` present) before the first merge.
+**Model C:** no `develop`. Configure the `main` ruleset (table row), repo settings (squash-only with PR title as commit message, auto-delete head branches, **allow auto-merge**), and Cloudflare production branch `main` with previews on all branches (hosting task). The baseline release needs no setup: the `bootstrap` job in `.github/workflows/release-please.yml` creates it on the first push to `main`. **Ruleset confirmation gate (C — required):** confirm the live `main` ruleset via `gh api repos/OWNER/REPO/rules/branches/main` (`pull_request` + required `test` and `pr-title` present) before the first merge. **Repo settings check (C — required):** `gh api repos/OWNER/REPO` shows `delete_branch_on_merge: true`, `allow_squash_merge: true` and `allow_auto_merge: true`. Auto-delete matters most: without it, the next lap on the same branch name can only push with a force push, which agents must not do (lap-close-order D3). If a value is wrong, hand the owner the link to `https://github.com/OWNER/REPO/settings` with the values to set, then read them again.
 
 **Model A / B:** create `develop` from `main` once (`git push origin main:develop`).
 

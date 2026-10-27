@@ -5,11 +5,6 @@
     "status": "to-do"
   },
   {
-    "title": "Fix Google sign-in returning to the wrong site with a PKCE error",
-    "description": "Seen on the production site after signing in with Google from a preview: 'PKCE code verifier not found in storage'. Supabase auth logs show the sign-in started on the preview origin, Supabase redirected to the Site URL (production) because the app's bare-origin redirect address did not match the '/**' allow-list pattern, and production then failed with bad_code_verifier. The app also exchanges the code twice (supabase-js does it during client init, then the callback hook again), which would show a false error even when sign-in works. Lap: documentation/jobs/temp_job_google-signin-return/BRIEF.md.",
-    "status": "in-progress"
-  },
-  {
     "title": "Configure Supabase",
     "description": "Set up the backend: one Supabase project with the auth providers you use enabled, its Site URL set to the app's primary origin, and its URL and publishable key available as VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (local .env, plus the hosting build variables for main and for previews). Before the app has real users, isolate staging from production with a Supabase Branching staging branch or a second project (documentation/DOC_CLOUDFLARE_WORKERS.md § Staging backend). Your coding agent lists the exact requirements, checks the result, and tells you what only you can do. For Google sign-in, requirements are in documentation/DOC_SUPABASE_GOOGLE_OAUTH.md. Agent gate: .agents/skills/loop-backlog/references/onboarding.md § Configuration tasks gate (Supabase).",
     "status": "to-do"

@@ -102,6 +102,8 @@ Then the agent prepares the change on a branch and hands the user the exact comm
 
 **Preview link (every PR, all modes):** the PR body carries a `## Preview` section with the live preview URL of the PR's branch. Take it from the `cloudflare-workers-and-pages[bot]` comment on the PR ("Preview URL: …", the branch alias URL, not the per-commit one). If that comment is missing, the URL is `https://<alias>-<worker name>.<workers.dev subdomain>.workers.dev` (alias = branch name lowercased, `/` and other non-alphanumerics → `-`; this repo: `https://<alias>-bronze-plate-harness.tom-fab.workers.dev`); verify it before writing it (HTTP 200, page loads `/assets/*.js`). Until then, write `Preview: pending (Workers Builds)` and edit the PR body to the real link when it appears. Also give the link in the chat handoff next to the PR link.
 
+**Who reads what (every PR, all modes):** the PR body is the record for agents and reviewers. The owner reads only the short chat handoff (`.agents/skills/loop-verdict/SKILL.md` § Output) and tests the preview; never require them to read the PR body to decide.
+
 Model A:
 
 - Keep PRs focused and reasonably sized; include a clear description.
@@ -121,11 +123,14 @@ Model A:
 ## Preview
 - <Workers Builds preview URL for this branch>
 
-## Test plan
-- [ ] Confirm PR base is `develop` (not `main`)
-- [ ] CI `test` green
-- [ ] <scoped checks for this change>
+## Verified
+- <checks run and what passed, e.g. CI `test` green, base is `develop`>
+
+## Not verified
+- <what no check covered>
 ```
+
+  No `- [ ]` task lists in a PR body (all modes): GitHub renders them as clickable boxes that read as a to-do for the owner, and nobody has to tick anything (merge-is-pass D6).
 
 - Title: conventional `type: Subject` (all modes — under C, release-please reads it and CI enforces it via `pr-title`).
 - Wait for required `test` check before merge; keep branch up to date with `develop`.

@@ -13,7 +13,7 @@ description: >-
 
 # meta-learn-lessons
 
-When this skill is done, the mistake cannot silently repeat: the guidance that caused it is narrowed or removed, any new lesson lives in exactly one home, and textbook knowledge was left out on purpose. Lessons ride the lap's PR, so the next Pass approves them (skill-loop D50).
+When this skill is done, the mistake cannot silently repeat: the guidance that caused it is narrowed or removed, any new lesson lives in exactly one home, and textbook knowledge was left out on purpose. Lessons ride the lap's PR, each one only after the owner's yes in chat; a Pass or a merge never approves them (merge-is-pass D3).
 
 ## Edges
 
