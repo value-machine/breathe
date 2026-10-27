@@ -1,10 +1,5 @@
 [
   {
-    "title": "Breathwork effect selection (choose an effect instead of Hz)",
-    "description": "Replace the raw carrier and beat Hz inputs with a choice of effect the user is aiming for. Each effect maps to a preset of carrier and beat range. Wording must not make health or effect claims (documentation/DOC_APP_VISION.md; labels describe what is synthesised). Lap: temp_job_breathwork-effects. Owner decides the effect list and labels at refine.",
-    "status": "in-progress"
-  },
-  {
     "title": "Fix Google sign-in returning to the wrong site with a PKCE error",
     "description": "Seen on the production site after signing in with Google from a preview: 'PKCE code verifier not found in storage'. Supabase auth logs show the sign-in started on the preview origin, Supabase redirected to the Site URL (production) because the app's bare-origin redirect address did not match the '/**' allow-list pattern, and production then failed with bad_code_verifier. The app also exchanges the code twice (supabase-js does it during client init, then the callback hook again), which would show a false error even when sign-in works. Lap: documentation/jobs/temp_job_google-signin-return/BRIEF.md.",
     "status": "in-progress"

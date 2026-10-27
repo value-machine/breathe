@@ -1,5 +1,10 @@
 [
   {
+    "title": "Breathwork effect selection (choose an effect instead of Hz)",
+    "description": "Replace the raw carrier and beat Hz inputs with a choice of effect the user is aiming for. Each effect maps to a preset of carrier and beat range. Wording must not make health or effect claims (documentation/DOC_APP_VISION.md; labels describe what is synthesised). Lap: temp_job_breathwork-effects. Result: merged in PR #5 (Calm, Focus, Sleep, Energize presets; Hz behind Advanced; beat trend across the session; speakers pulse instead of gating). Owner Pass at Stop 2.",
+    "status": "done"
+  },
+  {
     "title": "Breathwork sound cues (Web Audio or Tone.js)",
     "description": "Second lap of the breathwork timer. Rising soft tone on inhale, falling soft tone on exhale, subtle or silent drone during holds, wired to the sound on/off switch on the settings page (documentation/DOC_APP_VISION.md, design direction). Decided at refine: Web Audio API, no new dependency (D11). Binaural beats in headphones mode, isochronic tone in speakers mode. Lap 1 is temp_job_breathwork-timer. Result: merged in PR #4 (binaural headphones mode, isochronic speakers mode, continuous voice with crossfades). Owner Pass at Stop 2.",
     "status": "done"
