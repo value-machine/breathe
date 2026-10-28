@@ -1,6 +1,0 @@
-schema_version: "1.1"
-name: handoff-card-lists-decisions-and-rule-changes
-expected_outcome: |
-  The agent posts a handoff card with the preview URL, test steps, what is not verified, the decision line the PR records, and the rule change the Pass would approve, then asks one Pass / Change / Drop question.
-context:
-  scaffold_script: place-files.sh

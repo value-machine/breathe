@@ -17,6 +17,7 @@ export const THEME_COLOR_TOKENS = [
   "primary",
   "primary-foreground",
   "primary-gradient-start",
+  "echo-gold",
   "secondary",
   "secondary-foreground",
   "muted",

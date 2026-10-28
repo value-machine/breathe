@@ -65,6 +65,13 @@
         "hex": "#4f9994"
       }
     },
+    "echo-gold": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [0.8784, 0.6902, 0.3137],
+        "hex": "#e0b050"
+      }
+    },
     "secondary": {
       "$value": {
         "colorSpace": "srgb",

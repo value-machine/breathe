@@ -19,6 +19,7 @@
   --duration-normal: 200ms;
   --duration-slow: 600ms;
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --echo-gold: #b8860b;
   --elevation-brand: inset 0px 1px #ffffff80, inset 0px -1px #1f3a4a40, 0px 2px 4px #1f3a4a4d;
   --elevation-brand-active: inset 0px 2px 3px #0000004d;
   --elevation-lg: 0px 10px 15px -3px #0000001a, 0px 4px 6px -4px #0000001a;
@@ -61,6 +62,7 @@
   --card-foreground: #e6ebf0;
   --destructive: #f44336;
   --destructive-foreground: #fff;
+  --echo-gold: #e0b050;
   --elevation-brand: inset 0px 1px #ffffff1f, inset 0px -1px #00000059, 0px 2px 6px #00000080;
   --elevation-brand-active: inset 0px 2px 3px #00000073;
   --foreground: #e6ebf0;

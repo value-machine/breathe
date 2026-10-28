@@ -4,6 +4,7 @@ import {
   circleScaleAt,
   holdSecondsForRound,
   isCircleExpanded,
+  limitEchoCount,
   roundProgressAt,
   validateBreathSettings,
 } from "./breathSessionService";
@@ -130,5 +131,21 @@ describe("roundProgressAt", () => {
 
   it("should report the share of the current round including earlier phases when the round is midway", () => {
     expect(roundProgressAt(phases, { phaseIndex: 3, remainingMs: 2000 })).toBeCloseTo(0.75);
+  });
+});
+
+describe("limitEchoCount", () => {
+  const BREATH_THEN_HOLD: BreathPhase[] = [
+    { kind: "inhale", seconds: 2, round: 1 },
+    { kind: "hold", seconds: 3, round: 1 },
+    { kind: "exhale", seconds: 2, round: 1 },
+    { kind: "inhale", seconds: 2, round: 2 },
+  ];
+
+  it("should count the inhales and exhales that have ended when the phase index moves on", () => {
+    expect(limitEchoCount(BREATH_THEN_HOLD, 0)).toBe(0);
+    expect(limitEchoCount(BREATH_THEN_HOLD, 1)).toBe(1);
+    expect(limitEchoCount(BREATH_THEN_HOLD, 2)).toBe(1);
+    expect(limitEchoCount(BREATH_THEN_HOLD, 3)).toBe(2);
   });
 });

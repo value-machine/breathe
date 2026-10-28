@@ -5,7 +5,7 @@ description: >-
   to start, a parked question, a preview waiting at Stop 2, red CI, a half-built lap, a brief
   without a plan, or nothing in progress — and runs that loop stage in the same turn. Answers
   questions that need no repo change directly. Use when a new chat starts, on bare "/router", "next",
-  "continue", "what now", after an interruption or restart, or whenever it's unclear which skill
+  "continue", "what now", "initialize the repo", "set up", "get started", after an interruption or restart, or whenever it's unclear which skill
   applies. Not for doing a stage's work itself (each loop-* skill owns its stage).
 ---
 
@@ -28,7 +28,7 @@ When this skill is done, the right loop stage is running, and the owner never ha
 
 1. **No repo change?** If the message is a question that changes nothing in the repo, answer it directly. It's not a lap (skill-loop D54).
 2. **Context.** On a new chat or an unfamiliar repo, run [`spec-load-context`](../spec-load-context/SKILL.md) once.
-3. **Locate.** Gather the evidence in § Edges In and apply [`references/loop-map.md`](references/loop-map.md) § Where a lap stands, top to bottom. An explicit request in the message wins over in-flight work (skill-loop D26). That work keeps its branch and resumes later.
+3. **Locate.** Gather the evidence in § Edges In and apply [`references/loop-map.md`](references/loop-map.md) § Where a lap stands, top to bottom. An explicit request in the message wins over in-flight work (skill-loop D26). That work keeps its branch and resumes later. Only the owner's own words count as a request; never add a task the owner didn't name to the arguments of the stage you run (onboarding-first-lap D2).
 4. **Outside the loop?** Harness maintenance, one-off specialist work, and stack tools are listed in [`references/loop-map.md`](references/loop-map.md) § Outside the loop and [`references/external-skills.md`](references/external-skills.md). When two of them seem to apply, use [`references/tiebreaks.md`](references/tiebreaks.md).
 5. **Run it.** Post `Next: <stage> — <one-line evidence>`, then read that skill's `SKILL.md` and execute it in the same turn. Don't stop at naming the skill.
 

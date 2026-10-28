@@ -125,6 +125,15 @@ export const isCircleExpanded = (phases: BreathPhase[], phaseIndex: number): boo
 };
 
 /** Circle size range as scale factors: contracted (after an exhale) to expanded (after an inhale). */
+/**
+ * Breath limits passed before the phase at `phaseIndex`: each inhale (full size) and exhale
+ * (smallest size) that has ended. Holds reach no new limit, so they do not count. The count
+ * changes once per limit, which drives the golden echo ring.
+ */
+export const limitEchoCount = (phases: BreathPhase[], phaseIndex: number): number =>
+  phases.slice(0, phaseIndex).filter((phase) => phase.kind === "inhale" || phase.kind === "exhale")
+    .length;
+
 export const CIRCLE_MIN_SCALE = 0.5;
 export const CIRCLE_MAX_SCALE = 1;
 
