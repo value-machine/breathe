@@ -48,13 +48,13 @@ describe("ProfileMenu", () => {
   });
 
   describe("Internal anchor mode (default)", () => {
-    it("should render trigger button when user is not logged in", () => {
+    it("should label the trigger Theme when user is not logged in", () => {
       renderMenu();
       expect(screen.getByRole("button")).toBeInTheDocument();
-      expect(screen.getByLabelText(/sign in/i)).toBeInTheDocument();
+      expect(screen.getByLabelText("Theme")).toBeInTheDocument();
     });
 
-    it("should render trigger button when user is logged in", () => {
+    it("should label the trigger Theme when user is logged in", () => {
       const mockUser: User = {
         id: "123",
         email: "test@example.com",
@@ -65,7 +65,7 @@ describe("ProfileMenu", () => {
       });
       renderMenu();
       expect(screen.getByRole("button")).toBeInTheDocument();
-      expect(screen.getByLabelText(/account/i)).toBeInTheDocument();
+      expect(screen.getByLabelText("Theme")).toBeInTheDocument();
     });
 
     it("should open menu when trigger button is clicked", async () => {
@@ -80,20 +80,19 @@ describe("ProfileMenu", () => {
       });
     });
 
-    it("should show sign-in options when menu is opened and user is not logged in", async () => {
+    it("should not offer sign-in when menu is opened and user is not logged in", async () => {
       const user = userEvent.setup();
       renderMenu();
 
       const triggerButton = screen.getByRole("button");
       await user.click(triggerButton);
 
-      await waitFor(() => {
-        expect(screen.getByText(/sign in with google/i)).toBeInTheDocument();
-        expect(screen.getByText(/sign in with email/i)).toBeInTheDocument();
-      });
+      await waitFor(() => expect(screen.getByRole("menu")).toBeInTheDocument());
+      expect(screen.queryByText(/sign in with google/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/sign in with email/i)).not.toBeInTheDocument();
     });
 
-    it("should show profile info and sign-out when menu is opened and user is logged in", async () => {
+    it("should not offer sign-out when menu is opened and user is logged in", async () => {
       const mockUser: User = {
         id: "123",
         email: "test@example.com",
@@ -108,72 +107,8 @@ describe("ProfileMenu", () => {
       const triggerButton = screen.getByRole("button");
       await user.click(triggerButton);
 
-      await waitFor(() => {
-        expect(screen.getByText(/sign out/i)).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe("Sign-in interactions", () => {
-    it("should call signInWithGoogle when Google sign-in is clicked", async () => {
-      const user = userEvent.setup();
-      renderMenu();
-
-      const triggerButton = screen.getByRole("button");
-      await user.click(triggerButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/sign in with google/i)).toBeInTheDocument();
-      });
-
-      const signInButton = screen.getByText(/sign in with google/i);
-      await user.click(signInButton);
-
-      expect(mockSignInWithGoogle).toHaveBeenCalled();
-    });
-
-    it("should navigate to login when email sign-in is clicked", async () => {
-      const user = userEvent.setup();
-      renderMenu();
-
-      const triggerButton = screen.getByRole("button");
-      await user.click(triggerButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/sign in with email/i)).toBeInTheDocument();
-      });
-
-      const signInButton = screen.getByText(/sign in with email/i);
-      await user.click(signInButton);
-
-      expect(mockNavigate).toHaveBeenCalledWith("/login");
-    });
-  });
-
-  describe("Sign-out interaction", () => {
-    it("should call logout when sign-out is clicked", async () => {
-      const mockUser: User = {
-        id: "123",
-        email: "test@example.com",
-      } as User;
-      vi.mocked(useAuthContext).mockReturnValue({
-        ...defaultAuthContext,
-        user: mockUser,
-      });
-      const user = userEvent.setup();
-      renderMenu();
-
-      const triggerButton = screen.getByRole("button");
-      await user.click(triggerButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/sign out/i)).toBeInTheDocument();
-      });
-
-      const signOutButton = screen.getByText(/sign out/i);
-      await user.click(signOutButton);
-
-      expect(mockLogout).toHaveBeenCalled();
+      await waitFor(() => expect(screen.getByRole("menu")).toBeInTheDocument());
+      expect(screen.queryByText(/sign out/i)).not.toBeInTheDocument();
     });
   });
 

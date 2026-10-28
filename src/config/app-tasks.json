@@ -1,5 +1,10 @@
 [
   {
+    "title": "Site chrome fits the app and hides unused elements",
+    "description": "Owner request: the site chrome (header, navigation, profile menu, footer and layout shell) should match the breathwork app's look (theme tokens, spacing, typography) and hide every element the app does not use: template links, the harness overview card, dev-only items, and empty chrome. Keep dev-only tasks (/tasks) reachable only in local dev. Lap: to be created by loop-refine (scope of hidden items and auth-dependent items decided at refine).",
+    "status": "in-progress"
+  },
+  {
     "title": "Golden echo ring at the circle's limits (visual)",
     "description": "Owner request: a visual echo when the breathing circle reaches a limit. At the end of a full inhale (max size) and at the end of a full exhale (min size), a golden ring starts at the circle's edge, grows outward and fades as it grows, like an echo or afterimage. Decorative only: it must not change the timing or the circle itself, and users with reduced motion get no moving ring (a static or no effect). Colour from the theme tokens, not hard-coded. Lap: to be created by loop-refine (scope and reduced-motion choice at refine).",
     "status": "in-progress"

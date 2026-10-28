@@ -15,7 +15,7 @@ export const ProfileMenuTrigger = ({ user, profile }: ProfileMenuTriggerProps) =
   const isLoggedIn = user !== null;
   const avatarInitial = getAvatarInitial(user, profile);
   const avatarUrl = isLoggedIn ? getAvatarUrl(profile) : null;
-  const label = isLoggedIn ? "Account" : "Sign in";
+  const label = "Theme";
 
   return (
     <Tooltip title={label}>

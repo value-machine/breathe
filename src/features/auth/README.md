@@ -13,12 +13,12 @@ User authentication and session management via Supabase.
 
 ## Structure
 
-| Layer | Path | Purpose |
-|-------|------|---------|
-| Hooks | `hooks/` | `useAuth`, `useAuthSession`, `useAuthRedirect`, `useAuthCallbackHandler`, `useUserProfileQuery` |
-| Services | `services/` | `authService`, `authCallbackService`, `authErrorMessages`, `authValidation`, `userProfileService`, `authHandlerUtils` |
-| Components | `components/` | `SignInPanel`, `EmailAuthForm` |
-| Types | `types/` | `User`, `UserProfile`, `AuthContextValue`, credentials types |
+| Layer      | Path          | Purpose                                                                                                               |
+| ---------- | ------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Hooks      | `hooks/`      | `useAuth`, `useAuthSession`, `useAuthRedirect`, `useAuthCallbackHandler`, `useUserProfileQuery`                       |
+| Services   | `services/`   | `authService`, `authCallbackService`, `authErrorMessages`, `authValidation`, `userProfileService`, `authHandlerUtils` |
+| Components | `components/` | `SignInPanel`, `EmailAuthForm`                                                                                        |
+| Types      | `types/`      | `User`, `UserProfile`, `AuthContextValue`, credentials types                                                          |
 
 **Cross-layout UI:** `ProfileMenu` lives in `@/layouts/ProfileMenu` (app-shell widget used by Topbar; layouts may compose features, `components/common` may not). Shared viewport/form layout tokens live in `@/shared/theme/appViewLayout`.
 
@@ -43,7 +43,7 @@ Returns:
 
 ### Routes
 
-- `/login` – dedicated sign-in page (redirects to `/` when already authenticated)
+- `/login` – dedicated sign-in page (redirects to `/` when already authenticated). Not linked from the app chrome since the site-chrome lap (site-chrome D2): the top bar's profile menu holds only the theme toggle, and `/` no longer shows the sign-in panel. The routes and components remain for when accounts are needed.
 - `/reset-password` – password recovery from email link
 - `/` – inline sign-in when logged out; primary OAuth PKCE callback handler. supabase-js exchanges the `?code=` itself while the client initializes, so `handleCodeExchange` first checks `hasSignedInSession()` and only exchanges when there is no signed-in session (a second exchange fails with "PKCE code verifier not found"). The Google return address is `<origin>/` (ends with a slash so `<origin>/**` redirect patterns match)
 - `/auth/callback` – legacy OAuth callback (kept for backward compatibility)
