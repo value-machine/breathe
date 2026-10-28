@@ -18,6 +18,6 @@ export const BreathCircle = ({ scale, echoCount }: BreathCircleProps) => (
       className="size-64 rounded-full bg-secondary ring-4 ring-primary/40 transition-transform duration-100 ease-linear motion-reduce:transition-none"
       style={{ transform: `scale(${scale})` }}
     />
-    <BreathEchoRing count={echoCount} />
+    <BreathEchoRing count={echoCount} scale={scale} />
   </div>
 );

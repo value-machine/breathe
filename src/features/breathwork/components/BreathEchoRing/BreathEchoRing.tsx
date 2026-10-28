@@ -4,15 +4,17 @@ import { useLimitEcho } from "../../hooks/useLimitEcho";
 export interface BreathEchoRingProps {
   /** Breath limits passed so far; each new one plays the echo once. */
   count: number;
+  /** The circle's current scale; the echo starts from it, at the circle's edge. */
+  scale: number;
 }
 
 /**
  * Decorative golden ring over the breathing circle. It starts at the circle's edge and fades as
  * it grows, once per breath limit. Invisible at rest, so it only shows during the echo.
  */
-export const BreathEchoRing = ({ count }: BreathEchoRingProps) => {
+export const BreathEchoRing = ({ count, scale }: BreathEchoRingProps) => {
   const ringRef = useRef<HTMLDivElement>(null);
-  useLimitEcho(ringRef, count);
+  useLimitEcho(ringRef, count, scale);
 
   return (
     <div
