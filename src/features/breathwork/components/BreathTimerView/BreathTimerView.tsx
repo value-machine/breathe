@@ -1,4 +1,7 @@
+import { Pause, Play, Square } from "lucide-react";
 import { Button } from "@/components/common/Button";
+import { Progress } from "@/components/common/Progress";
+import { cn } from "@/shared/utils/cn";
 import type { BreathPhase, BreathPhaseKind } from "../../types/breathwork.types";
 import type { BreathSessionStatus } from "../../hooks/useBreathSession";
 import { BreathCircle } from "../BreathCircle/BreathCircle";
@@ -36,50 +39,53 @@ export const BreathTimerView = ({
 }: BreathTimerViewProps) => {
   const isPaused = status === "paused";
   const roundPercent = Math.round(roundProgress * 100);
+  const label = isPaused ? "Paused" : current ? PHASE_LABEL[current.kind] : "Done";
 
   return (
     <section
       aria-label="Breathing session"
-      className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col items-center gap-8 px-4 py-8"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-between gap-6 py-6 sm:py-10"
     >
-      <div className="flex h-72 items-center justify-center">
-        <BreathCircle scale={circleScale} />
-      </div>
-      <p aria-live="polite" className="font-heading text-2xl text-foreground">
-        {isPaused ? "Paused" : current ? PHASE_LABEL[current.kind] : "Done"}
-      </p>
-      <p className="text-4xl tabular-nums text-foreground">{current ? phaseRemainingSeconds : 0}</p>
-      <div className="w-full">
-        <div
-          role="progressbar"
-          aria-label="Progress in this round"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={roundPercent}
-          className="h-2 w-full overflow-hidden rounded-full bg-muted"
-        >
-          <div
-            className="h-full bg-primary transition-[width] duration-100 ease-linear"
-            style={{ width: `${roundPercent}%` }}
-          />
-        </div>
-        <p className="mt-2 text-sm text-muted-foreground">
+      <div className="flex w-full flex-col items-center gap-3">
+        <p className="text-sm font-medium tracking-wide text-muted-foreground">
           {current ? `Round ${current.round} of ${totalRounds}` : `${totalRounds} rounds`}
         </p>
+        <Progress
+          aria-label="Progress in this round"
+          value={roundPercent}
+          className="max-w-56"
+          indicatorClassName="transition-transform duration-100 ease-linear"
+        />
       </div>
-      <div className="flex w-full gap-3">
+
+      <BreathCircle
+        scale={circleScale}
+        phase={current?.kind ?? null}
+        className={cn("transition-opacity duration-(--duration-slow)", isPaused && "opacity-60")}
+      >
+        <div className="flex flex-col items-center gap-1 text-center text-foreground">
+          <p aria-live="polite" className="font-heading text-2xl">
+            <span key={label} className="block animate-in duration-700 fade-in">
+              {label}
+            </span>
+          </p>
+          <p className="text-5xl font-normal tabular-nums">{current ? phaseRemainingSeconds : 0}</p>
+        </div>
+      </BreathCircle>
+
+      <div className="grid w-full grid-cols-3 items-center justify-items-center">
+        <Button variant="outline" size="icon-lg" aria-label="Stop" onClick={onStop}>
+          <Square aria-hidden="true" className="fill-current" />
+        </Button>
         {isPaused ? (
-          <Button className="flex-1" onClick={onResume}>
-            Resume
+          <Button size="icon-xl" aria-label="Resume" onClick={onResume}>
+            <Play aria-hidden="true" className="translate-x-0.5 fill-current" />
           </Button>
         ) : (
-          <Button className="flex-1" variant="secondary" onClick={onPause}>
-            Pause
+          <Button size="icon-xl" aria-label="Pause" onClick={onPause}>
+            <Pause aria-hidden="true" className="fill-current" />
           </Button>
         )}
-        <Button className="flex-1" variant="outline" onClick={onStop}>
-          Stop
-        </Button>
       </div>
     </section>
   );

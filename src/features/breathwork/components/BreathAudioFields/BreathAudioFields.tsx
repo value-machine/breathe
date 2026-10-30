@@ -1,6 +1,15 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { ChevronDown, Leaf, Moon, Sun, Target } from "lucide-react";
 import { Button } from "@/components/common/Button";
-import { FormField } from "@/components/common/FormField";
+import { ChoiceCard } from "@/components/common/ChoiceCard";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/common/Collapsible";
+import { NumberStepper } from "@/components/common/NumberStepper";
+import { SegmentedControl } from "@/components/common/SegmentedControl";
+import { cn } from "@/shared/utils/cn";
 import type {
   BreathAudioMode,
   BreathAudioSettings,
@@ -18,19 +27,26 @@ export interface BreathAudioFieldsProps {
   onChange: (next: BreathAudioSettings) => void;
 }
 
-const MODES: { mode: BreathAudioMode; label: string }[] = [
-  { mode: "headphones", label: "Headphones" },
-  { mode: "speakers", label: "Speakers" },
+const MODES: { value: BreathAudioMode; label: string }[] = [
+  { value: "headphones", label: "Headphones" },
+  { value: "speakers", label: "Speakers" },
 ];
 
 const HELP: Record<BreathAudioMode, string> = {
-  headphones: "Headphones: each ear hears its own tone, so the beat is in your head.",
-  speakers: "Speakers: the carrier pulses at the beat rate. No headphones needed.",
+  headphones: "Each ear hears its own tone, so the beat is in your head.",
+  speakers: "The tone pulses at the beat rate. No headphones needed.",
 };
 
-/** What is synthesised for a preset: band, beat range and carrier. No effect claims. */
+const EFFECT_ICON: Record<BreathEffectPreset["id"], ReactNode> = {
+  calm: <Leaf />,
+  focus: <Target />,
+  sleep: <Moon />,
+  energize: <Sun />,
+};
+
+/** What is synthesised for a preset: band and beat range. No effect claims. */
 const describePreset = (preset: BreathEffectPreset): string =>
-  `${preset.band} band · beat ${preset.beatLowHz}–${preset.beatHighHz} Hz · carrier ${preset.carrierHz} Hz`;
+  `${preset.band} · ${preset.beatLowHz}–${preset.beatHighHz} Hz`;
 
 /** Effect picker, output mode and an advanced Hz section that is hidden by default. */
 export const BreathAudioFields = ({
@@ -41,89 +57,77 @@ export const BreathAudioFields = ({
   onChange,
 }: BreathAudioFieldsProps) => {
   const [advancedOpen, setAdvancedOpen] = useState(false);
-  const selected = presets.find((preset) => preset.id === audio.effect);
 
   const editHz = (next: Partial<BreathAudioSettings>): void => {
     onChange({ ...audio, ...next, effect: "custom" });
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div role="group" aria-label="Sound mode" className="flex gap-3">
-        {MODES.map(({ mode, label }) => (
-          <Button
-            key={mode}
-            type="button"
-            className="flex-1"
-            variant={audio.mode === mode ? "secondary" : "outline"}
-            aria-pressed={audio.mode === mode}
-            onClick={() => onChange({ ...audio, mode })}
-          >
-            {label}
-          </Button>
-        ))}
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <SegmentedControl
+          aria-label="Sound mode"
+          options={MODES}
+          value={audio.mode}
+          onValueChange={(mode) => onChange({ ...audio, mode })}
+        />
+        <p className="px-1 text-xs text-muted-foreground">{HELP[audio.mode]}</p>
       </div>
-      <p className="text-sm text-muted-foreground">{HELP[audio.mode]}</p>
 
-      <div role="group" aria-label="Effect" className="flex flex-col gap-2">
+      <div role="group" aria-label="Effect" className="grid grid-cols-2 gap-2">
         {presets.map((preset) => (
-          <Button
+          <ChoiceCard
             key={preset.id}
-            type="button"
-            variant={audio.effect === preset.id ? "secondary" : "outline"}
-            aria-pressed={audio.effect === preset.id}
+            label={preset.label}
+            description={describePreset(preset)}
+            icon={EFFECT_ICON[preset.id]}
+            selected={audio.effect === preset.id}
             onClick={() => onPickEffect(preset.id)}
-          >
-            {preset.label}
-          </Button>
+          />
         ))}
       </div>
-      <p className="text-sm text-muted-foreground">
-        {selected ? describePreset(selected) : "Custom values (advanced)"}
-      </p>
 
-      <Button
-        type="button"
-        variant="ghost"
-        aria-expanded={advancedOpen}
-        onClick={() => setAdvancedOpen((open) => !open)}
-      >
-        Advanced
-      </Button>
-      {advancedOpen && (
-        <div className="flex flex-col gap-4">
-          <FormField
+      <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+        <CollapsibleTrigger asChild>
+          <Button type="button" variant="ghost" size="sm" className="self-start px-2">
+            Advanced
+            <ChevronDown
+              aria-hidden="true"
+              className={cn(
+                "transition-transform duration-(--duration-normal)",
+                advancedOpen && "rotate-180"
+              )}
+            />
+          </Button>
+        </CollapsibleTrigger>
+        {audio.effect === "custom" && (
+          <p className="px-2 text-xs text-muted-foreground">Custom values</p>
+        )}
+        <CollapsibleContent className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <NumberStepper
             label="Carrier (Hz)"
-            type="number"
-            inputMode="numeric"
-            step={1}
             min={bounds.carrierHz.min}
             max={bounds.carrierHz.max}
+            step={10}
             value={audio.carrierHz}
-            onChange={(event) => editHz({ carrierHz: Number(event.target.value) })}
+            onValueChange={(carrierHz) => editHz({ carrierHz })}
           />
-          <FormField
-            label="Beat at the low point (Hz)"
-            type="number"
-            inputMode="numeric"
-            step={1}
+          <NumberStepper
+            label="Beat low (Hz)"
             min={bounds.beatLowHz.min}
             max={bounds.beatLowHz.max}
             value={audio.beatLowHz}
-            onChange={(event) => editHz({ beatLowHz: Number(event.target.value) })}
+            onValueChange={(beatLowHz) => editHz({ beatLowHz })}
           />
-          <FormField
-            label="Beat at the high point (Hz)"
-            type="number"
-            inputMode="numeric"
-            step={1}
+          <NumberStepper
+            label="Beat high (Hz)"
             min={bounds.beatHighHz.min}
             max={bounds.beatHighHz.max}
             value={audio.beatHighHz}
-            onChange={(event) => editHz({ beatHighHz: Number(event.target.value) })}
+            onValueChange={(beatHighHz) => editHz({ beatHighHz })}
           />
-        </div>
-      )}
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };

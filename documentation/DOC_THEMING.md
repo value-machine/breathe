@@ -32,15 +32,13 @@ Components never use raw colors or one-off values for themeable aspects; they us
 
 **Workflow:** edit a `*.tokens.json` file → `pnpm tokens:build` → commit the JSON and `tokens.generated.css` together. If you forget the build, the test suite fails and names the fix. `pnpm tokens:check` lints the files with Terrazzo.
 
-## Default theme: bronze plate
+## Default theme: Breathe pastel
 
-The shipped tokens are the "Engraved plate" bronze identity, chosen by the owner from live previews (2026-10-20) over "Classic foundry" and "Modern metal":
-- **Type:** Cinzel headings (engraved Roman capitals) and Inter body.
-- **Shape:** 0.25rem plate corners; buttons follow `radius`.
-- **Primary:** bronze, with a bevelled metallic gradient button (`elevation-brand` uses inset highlight and shade).
-  Dark mode uses the lighter bronze `#d4a05e` (gradient start `#a87238`) on purpose: the darker first pick failed WCAG AA for button text (2.49:1 → 4.52:1). Keep button text at AA when changing these.
-- **Secondary:** verdigris.
-- **Surfaces:** warm paper in light mode, warm charcoal in dark mode.
+The shipped tokens follow the Breathwork Timer design (`documentation/DOC_APP_VISION.md` § Design direction): a calm, soft identity for a breathing app.
+- **Type:** Fraunces headings (soft optical-size serif) and Inter body. Numbers that update or are edited (countdown, steppers) use Inter with `tabular-nums`, because Fraunces' old-style figures sit unevenly.
+- **Shape:** 1rem base radius for soft surfaces; `button-radius` is a pill (9999px).
+- **Primary:** deep teal (`#3a7b78`, a shade deeper than the design teal so white button text reaches WCAG AA). Dark mode uses the lighter teal `#6fb8b4` with dark text.
+- **Secondary / accent:** mint. **Cards:** peach. **Background:** lavender-blue in light mode, deep blue-gray in dark mode.
 
 Fonts load from Google Fonts in `index.html`. When you change `font.*` tokens, update that link too.
 

@@ -9,8 +9,8 @@
   --background: #d6e2f0;
   --body-font: "Inter", sans-serif;
   --border: #3a3a3a1f;
-  /* Plate buttons: follow the base radius. */
-  --button-radius: var(--radius);
+  /* Pill buttons: soft, touch-friendly controls. */
+  --button-radius: 9999px;
   --card: #f9dcc4;
   --card-foreground: #3a3a3a;
   --destructive: #c62828;
@@ -26,8 +26,8 @@
   --elevation-sm: 0px 1px 3px #0000001a, 0px 1px 2px -1px #0000001a;
   --elevation-xl: 0px 20px 25px -5px #0000001a, 0px 8px 10px -6px #0000001a;
   --foreground: #3a3a3a;
-  /* Engraved Roman capitals for headings. */
-  --heading-font: "Cinzel", serif;
+  /* Soft optical-size serif for headings: calm, warm, readable. */
+  --heading-font: "Fraunces", serif;
   --info: #0277bd;
   --input: #3a3a3a4d;
   --mono-font: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", "Liberation Mono", monospace;
@@ -39,8 +39,8 @@
   --primary: #3a7b78;
   --primary-foreground: #fff;
   --primary-gradient-start: #2c6b68;
-  /* Base radius; Tailwind rounded-sm/md/lg/xl derive from it. */
-  --radius: 0.25rem;
+  /* Base radius (soft, rounded surfaces); Tailwind rounded-sm/md/lg/xl derive from it. */
+  --radius: 1rem;
   --ring: #4b908d;
   --scrollbar: #3a3a3a4d;
   --scrollbar-hover: #3a3a3a80;

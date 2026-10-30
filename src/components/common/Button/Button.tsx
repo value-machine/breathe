@@ -5,7 +5,7 @@ import { cn } from "@/shared/utils/cn";
 
 /**
  * Button variants (shadcn/ui). Brand look lives here and in `src/index.css`:
- * - default: brand gradient (metallic bronze by default) for main actions
+ * - default: brand gradient (deep teal) for main actions
  * - outline: white outline with sweep-on-hover for secondary actions
  * - ghost: primary-colored text button
  */
@@ -26,6 +26,8 @@ export const buttonVariants = cva(
         sm: "h-9 px-4",
         lg: "h-14 px-8 text-base",
         icon: "size-9",
+        "icon-lg": "size-14 [&_svg:not([class*='size-'])]:size-5",
+        "icon-xl": "size-20 [&_svg:not([class*='size-'])]:size-8",
       },
     },
     defaultVariants: {
