@@ -48,10 +48,10 @@ The Breathwork Timer is a single-page web app that guides a user through a confi
 
 ### Design direction
 
-- Calm, soft pastel palette: lavender-blue background, peach and mint surfaces, and a deep teal for interactive elements. Text is soft dark gray.
+- Calm, soft palette ("Dawn", picked by the owner over the original lavender-and-peach design colors and two other options): warm cream background, off-white cards, sage mint for breath surfaces, and a deep teal for interactive elements. Text is soft warm dark gray.
 - Mobile-first layout that also scales to desktop. Large, centered breathing circle; play button centrally placed on the settings page; play, pause and stop at the bottom of the timer page.
 - Smooth transitions and fades between phases.
-- Typography and shape (decided in the UI redesign lap): Fraunces headings, Inter body, soft 1rem corners and pill buttons. The breathing orb is mint during breaths and warms to peach during a hold, between two guide rings that mark a full and an empty breath.
+- Typography and shape (decided in the UI redesign lap): Fraunces headings, Inter body, soft 1rem corners and pill buttons. The breathing orb is mint during breaths and lightens to the card color during a hold, between two guide rings that mark a full and an empty breath.
 
 The palette is mapped to the theme tokens in `src/shared/theme/tokens/`. Two adjustments were needed for WCAG AA: the primary teal is set a shade deeper than the design teal so white button text reaches 4.5:1, and the muted text is darkened for the same reason. Dark mode is not in the design; its values are a derived counterpart.
 
