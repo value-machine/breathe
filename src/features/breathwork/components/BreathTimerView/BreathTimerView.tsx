@@ -69,7 +69,9 @@ export const BreathTimerView = ({
               {label}
             </span>
           </p>
-          <p className="text-5xl font-normal tabular-nums">{current ? phaseRemainingSeconds : 0}</p>
+          <p className="font-heading text-6xl lining-nums tabular-nums">
+            {current ? phaseRemainingSeconds : 0}
+          </p>
         </div>
       </BreathCircle>
 

@@ -35,7 +35,7 @@ Components never use raw colors or one-off values for themeable aspects; they us
 ## Default theme: Breathe pastel
 
 The shipped tokens follow the Breathwork Timer design (`documentation/DOC_APP_VISION.md` § Design direction): a calm, soft identity for a breathing app.
-- **Type:** Fraunces headings (soft optical-size serif) and Inter body. Numbers that update or are edited (countdown, steppers) use Inter with `tabular-nums`, because Fraunces' old-style figures sit unevenly.
+- **Type:** Fraunces headings (soft optical-size serif) and Inter body. Prominent numbers (countdown, stepper values) use Fraunces with `lining-nums tabular-nums`, so they match the headings and do not shift width as they change.
 - **Shape:** 1rem base radius for soft surfaces; `button-radius` is a pill (9999px).
 - **Primary:** deep teal (`#2f7470` in light mode, deep enough that white button text reaches WCAG AA, 5.4:1). Dark mode uses the lighter teal `#6fb8b4` with dark text.
 - **Light mode ("Dawn", owner pick):** warm cream background `#f5efe8`, off-white cards `#fffaf4`, sage mint secondary/accent `#d8e8dc`, warm beige muted `#ebe2d8`, warm dark gray text `#3a3431`, teal `#2f7470`. Every text pair passes WCAG AA.

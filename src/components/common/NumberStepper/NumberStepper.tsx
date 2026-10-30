@@ -73,7 +73,7 @@ export const NumberStepper = ({
             value={value}
             aria-describedby={describedBy}
             onChange={(event) => onValueChange(Number(event.target.value))}
-            className="w-[3.5ch] [appearance:textfield] rounded-md bg-transparent text-center text-xl font-medium text-foreground tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="w-[3.5ch] [appearance:textfield] rounded-md bg-transparent text-center font-heading text-2xl text-foreground lining-nums tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
           {unit && (
             <span id={unitId} className="shrink-0 text-xs text-muted-foreground">
