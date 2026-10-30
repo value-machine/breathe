@@ -1,10 +1,5 @@
 [
   {
-    "title": "Redesign the breathwork UI to the calm feel of the vision",
-    "description": "Owner asked for a redesign of the simple UI in line with the app's feel, including kit atom components that shadcn does not ship. Settings page with steppers, sound switch, effect tiles and a sticky Play bar; timer page with a glowing orb, guide rings and round icon controls; Fraunces headings, soft radius, pill buttons. Lap: documentation/jobs/temp_job_ui-redesign/BRIEF.md.",
-    "status": "in-progress"
-  },
-  {
     "title": "Chime cues at breath phase changes (chime theme: deep improvement)",
     "description": "Owner asked for a deep improvement that aligns to the chime theme. Current gap: the breath sound is one continuous tone (binaural or isochronic) and gives no discrete signal when a phase changes, so the user has to watch the screen to know when to inhale, exhale or hold. Candidate direction: a soft chime at each inhale start, a lower chime at each exhale start, and a distinct chime at round end, layered over the continuous bed, with the chime sound and volume set in the sound fields. Owner picks the scope and sound at refine. Sound must not claim health effects (documentation/DOC_APP_VISION.md). Lap: to be created by loop-refine.",
     "status": "in-progress"
