@@ -32,15 +32,14 @@ Components never use raw colors or one-off values for themeable aspects; they us
 
 **Workflow:** edit a `*.tokens.json` file → `pnpm tokens:build` → commit the JSON and `tokens.generated.css` together. If you forget the build, the test suite fails and names the fix. `pnpm tokens:check` lints the files with Terrazzo.
 
-## Default theme: bronze plate
+## Default theme: Breathe pastel
 
-The shipped tokens are the "Engraved plate" bronze identity, chosen by the owner from live previews (2026-10-20) over "Classic foundry" and "Modern metal":
-- **Type:** Cinzel headings (engraved Roman capitals) and Inter body.
-- **Shape:** 0.25rem plate corners; buttons follow `radius`.
-- **Primary:** bronze, with a bevelled metallic gradient button (`elevation-brand` uses inset highlight and shade).
-  Dark mode uses the lighter bronze `#d4a05e` (gradient start `#a87238`) on purpose: the darker first pick failed WCAG AA for button text (2.49:1 → 4.52:1). Keep button text at AA when changing these.
-- **Secondary:** verdigris.
-- **Surfaces:** warm paper in light mode, warm charcoal in dark mode.
+The shipped tokens follow the Breathwork Timer design (`documentation/DOC_APP_VISION.md` § Design direction): a calm, soft identity for a breathing app.
+- **Type:** Fraunces headings (soft optical-size serif) and Inter body. Prominent numbers (countdown, stepper values) use Fraunces with `lining-nums tabular-nums`, so they match the headings and do not shift width as they change.
+- **Shape:** 1rem base radius for soft surfaces; `button-radius` is a pill (9999px).
+- **Primary:** deep teal (`#2f7470` in light mode, deep enough that white button text reaches WCAG AA, 5.4:1). Dark mode uses the lighter teal `#6fb8b4` with dark text.
+- **Light mode ("Dawn", owner pick):** warm cream background `#f5efe8`, off-white cards `#fffaf4`, sage mint secondary/accent `#d8e8dc`, warm beige muted `#ebe2d8`, warm dark gray text `#3a3431`, teal `#2f7470`. Every text pair passes WCAG AA.
+- **Dark mode:** deep blue-gray background and cards, muted teal-green secondary.
 
 Fonts load from Google Fonts in `index.html`. When you change `font.*` tokens, update that link too.
 

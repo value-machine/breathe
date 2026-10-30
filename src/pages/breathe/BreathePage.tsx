@@ -6,6 +6,9 @@ import {
   BREATH_SETTINGS_BOUNDS,
   buildBreathPhases,
   DEFAULT_BREATH_SETTINGS,
+  formatSessionLength,
+  holdProgression,
+  sessionSeconds,
   validateBreathSettings,
 } from "@/features/breathwork/services/breathSessionService";
 import {
@@ -31,6 +34,16 @@ export const BreathePage = () => {
   const breathAudio = useBreathAudio();
 
   const validation = useMemo(() => validateBreathSettings(settings), [settings]);
+  const summary = useMemo(
+    () =>
+      validation.ok
+        ? {
+            holdPlan: holdProgression(validation.value),
+            sessionLength: formatSessionLength(sessionSeconds(buildBreathPhases(validation.value))),
+          }
+        : { holdPlan: null, sessionLength: null },
+    [validation]
+  );
   const error = validation.ok ? (soundOn ? validateAudioSettings(audio) : null) : validation.error;
 
   const handlePlay = useCallback(() => {
@@ -67,6 +80,8 @@ export const BreathePage = () => {
         effectPresets={EFFECT_PRESETS}
         onPickEffect={(effect) => setAudio(audioSettingsForEffect(effect, audio.mode))}
         error={error}
+        holdPlan={summary.holdPlan}
+        sessionLength={summary.sessionLength}
         soundOn={soundOn}
         onSettingsChange={setSettings}
         onAudioChange={setAudio}

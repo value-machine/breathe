@@ -21,6 +21,8 @@ const renderForm = (overrides: Partial<Parameters<typeof BreathSettingsForm>[0]>
     effectPresets: EFFECT_PRESETS,
     onPickEffect: vi.fn(),
     error: null,
+    holdPlan: [20, 40, 60],
+    sessionLength: "6 min",
     soundOn: true,
     onSettingsChange: vi.fn(),
     onAudioChange: vi.fn(),
@@ -51,11 +53,36 @@ describe("BreathSettingsForm", () => {
   it("should report the new value when a number field changes", async () => {
     const props = renderForm();
 
-    fireEvent.change(screen.getByLabelText("Number of rounds"), { target: { value: "5" } });
+    fireEvent.change(screen.getByLabelText("Rounds"), { target: { value: "5" } });
 
     expect(props.onSettingsChange).toHaveBeenLastCalledWith({
       ...DEFAULT_BREATH_SETTINGS,
       rounds: 5,
     });
+  });
+
+  it("should report one step up when the increase button of a field is pressed", async () => {
+    const props = renderForm();
+
+    await userEvent.click(screen.getByRole("button", { name: "Increase Hold target" }));
+
+    expect(props.onSettingsChange).toHaveBeenLastCalledWith({
+      ...DEFAULT_BREATH_SETTINGS,
+      holdTargetSeconds: DEFAULT_BREATH_SETTINGS.holdTargetSeconds + 5,
+    });
+  });
+
+  it("should call onSoundToggle when the sound switch is pressed", async () => {
+    const props = renderForm();
+
+    await userEvent.click(screen.getByRole("switch", { name: "Sound" }));
+
+    expect(props.onSoundToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it("should show the hold of each round when the settings are valid", () => {
+    renderForm();
+
+    expect(screen.getByText("Holds: 20 · 40 · 60 s")).toBeInTheDocument();
   });
 });

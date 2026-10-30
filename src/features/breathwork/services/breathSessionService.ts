@@ -82,6 +82,20 @@ export const buildBreathPhases = (settings: BreathSettings): BreathPhase[] => {
   return phases;
 };
 
+/** Total length of a phase list in seconds (shown on the settings page before Play). */
+export const sessionSeconds = (phases: BreathPhase[]): number =>
+  phases.reduce((total, phase) => total + phase.seconds, 0);
+
+/** Rough session length for display: seconds under a minute, else whole minutes. */
+export const formatSessionLength = (seconds: number): string =>
+  seconds < 60 ? `${seconds} s` : `${Math.round(seconds / 60)} min`;
+
+/** Hold length of every round, in order (the progression the settings page previews). */
+export const holdProgression = (settings: BreathSettings): number[] =>
+  Array.from({ length: settings.rounds }, (_, index) =>
+    holdSecondsForRound(index + 1, settings.rounds, settings.holdTargetSeconds)
+  );
+
 /** Where a running session is: which phase, and how much of it is left. */
 export interface BreathSessionProgress {
   phaseIndex: number;

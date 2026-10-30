@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   buildBreathPhases,
   circleScaleAt,
+  formatSessionLength,
+  holdProgression,
   holdSecondsForRound,
   isCircleExpanded,
   roundProgressAt,
+  sessionSeconds,
   validateBreathSettings,
 } from "./breathSessionService";
 import type { BreathPhase, BreathSettings } from "../types/breathwork.types";
@@ -130,5 +133,26 @@ describe("roundProgressAt", () => {
 
   it("should report the share of the current round including earlier phases when the round is midway", () => {
     expect(roundProgressAt(phases, { phaseIndex: 3, remainingMs: 2000 })).toBeCloseTo(0.75);
+  });
+});
+
+describe("session summary", () => {
+  it("should sum every phase when the success check settings are built", () => {
+    // Round 1: 2+2 breath, 2 hold, 2 inhale, 15 hold, 2 exhale; round 2 holds the full 6.
+    expect(sessionSeconds(buildBreathPhases(SUCCESS_CHECK_SETTINGS))).toBe(25 + 29);
+  });
+
+  it("should list the hold of each round when the target is 60 over three rounds", () => {
+    expect(
+      holdProgression({ ...SUCCESS_CHECK_SETTINGS, rounds: 3, holdTargetSeconds: 60 })
+    ).toEqual([20, 40, 60]);
+  });
+
+  it("should show seconds when the session is shorter than a minute", () => {
+    expect(formatSessionLength(54)).toBe("54 s");
+  });
+
+  it("should round to whole minutes when the session is a minute or longer", () => {
+    expect(formatSessionLength(390)).toBe("7 min");
   });
 });

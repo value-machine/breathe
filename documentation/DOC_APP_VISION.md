@@ -48,9 +48,10 @@ The Breathwork Timer is a single-page web app that guides a user through a confi
 
 ### Design direction
 
-- Calm, soft pastel palette: lavender-blue background, peach and mint surfaces, and a deep teal for interactive elements. Text is soft dark gray.
+- Calm, soft palette ("Dawn", picked by the owner over the original lavender-and-peach design colors and two other options): warm cream background, off-white cards, sage mint for breath surfaces, and a deep teal for interactive elements. Text is soft warm dark gray.
 - Mobile-first layout that also scales to desktop. Large, centered breathing circle; play button centrally placed on the settings page; play, pause and stop at the bottom of the timer page.
 - Smooth transitions and fades between phases.
+- Typography and shape (decided in the UI redesign lap): Fraunces headings, Inter body, soft 1rem corners and pill buttons. The breathing orb is mint during breaths and lightens to the card color during a hold, between two guide rings that mark a full and an empty breath.
 
 The palette is mapped to the theme tokens in `src/shared/theme/tokens/`. Two adjustments were needed for WCAG AA: the primary teal is set a shade deeper than the design teal so white button text reaches 4.5:1, and the muted text is darkened for the same reason. Dark mode is not in the design; its values are a derived counterpart.
 
@@ -66,7 +67,6 @@ The palette is mapped to the theme tokens in `src/shared/theme/tokens/`. Two adj
 
 ## Optional: open questions
 
-- Typography and corner radius: the design does not specify them. The current theme uses an engraved Cinzel heading font and 0.25rem corners, which were chosen for the previous bronze identity. Keep, or switch to a softer set?
 - Hosting: the design names Firebase; this repo deploys to Cloudflare Workers. Confirm Workers is the target.
 - Settings persistence: the design does not say whether settings or completed sessions are stored (per device, or in Supabase for logged-in users).
 - Sound: the design specifies a silent or subtle tone for holds, but not the default for the sound on/off switch or whether sound is allowed before the first user tap (browser audio policy).
